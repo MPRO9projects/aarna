@@ -1,0 +1,112 @@
+.floating-contact {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+}
+
+.floating-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #40151e; /* Your maroon color */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid rgba(212, 175, 55, 0.3); /* Subtle gold border */
+}
+
+.floating-btn:hover {
+  transform: translateY(-3px);
+  background: #D4AF37; /* Gold on hover */
+  color: #40151e; /* Maroon icon on hover */
+  border-color: #D4AF37;
+  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.25);
+}
+
+/* Individual button subtle variations */
+.floating-btn.whatsapp:hover {
+  background: #25d366; /* Keep WhatsApp green on hover */
+  border-color: #25d366;
+  color: #fff;
+}
+
+.floating-btn.email:hover {
+  background: #D4AF37; /* Gold */
+  color: #40151e; /* Maroon */
+}
+
+.floating-btn.call:hover {
+  background: #D4AF37; /* Gold */
+  color: #40151e; /* Maroon */
+}
+
+/* Tooltip Styling */
+.tooltip {
+  position: absolute;
+  left: 58px;
+  background: #40151e; /* Maroon */
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  transform: translateX(-5px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.floating-btn:hover .tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Tooltip arrow */
+.tooltip::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 5px solid #40151e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .floating-contact {
+    bottom: 20px;
+    left: 20px;
+    gap: 10px;
+  }
+  
+  .floating-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+  }
+  
+  .tooltip {
+    left: 52px;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+  }
+}

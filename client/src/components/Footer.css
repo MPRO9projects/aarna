@@ -1,0 +1,691 @@
+/* ===== FOOTER BASE ===== */
+.site-footer {
+  background: linear-gradient(180deg, #5a0f2d 0%, #3a061a 100%);
+  color: #f7edee;
+  padding: 60px 0 28px;
+  /* font-family: "Manrope", sans-serif; */
+  font-family: 'Libre Baskerville', serif;
+}
+
+/* ===== CONTAINER ===== */
+.footer-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 22px;
+}
+
+/* ===== TOP GRID ===== */
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 0.9fr 1.2fr;
+  gap: 36px;
+  margin-bottom: 40px;
+}
+
+/* ===== BRAND ===== */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo {
+  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.footer-logo-image {
+  height: 78px;
+  margin-bottom: 14px;
+  transition: transform 0.35s ease, filter 0.35s ease;
+  cursor: pointer;
+}
+
+.footer-logo-image:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.footer-desc {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255, 240, 244, 0.85);
+  max-width: 340px;
+  margin-bottom: 20px;
+}
+
+/* ===== SOCIAL ===== */
+.footer-socials {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer-socials a {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.footer-socials a:hover {
+  background: linear-gradient(135deg, #d4af37, #b8860b, #ffd700, #daa520);
+  color: #2c0a18;
+  border-color: #ffd700;
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 10px 24px rgba(212, 175, 55, 0.4);
+}
+
+/* ===== TITLES ===== */
+.footer-title {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.5rem;
+  margin-bottom: 18px;
+  color: #fff;
+  position: relative;
+  font-weight: 700;
+}
+
+.footer-title::after {
+  content: "";
+  width: 36px;
+  height: 2px;
+  background: linear-gradient(90deg, #d4af37, #ffd700, #daa520);
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  transition: width 0.3s ease;
+}
+
+.footer-nav-group:hover .footer-title::after,
+.footer-action:hover .footer-title::after {
+  width: 60px;
+  background: linear-gradient(90deg, #ffd700, #fff0a0, #ffd700);
+}
+
+/* ===== NAV GROUP ===== */
+.footer-nav-group,
+.footer-action {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== LINKS ===== */
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+}
+
+.footer-links a,
+.static-link {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: rgba(255, 240, 244, 0.85);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.footer-links a {
+  cursor: pointer;
+}
+
+.static-link {
+  cursor: pointer;
+}
+
+/* Shining Gold hover effect */
+.footer-links a::after,
+.static-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #d4af37, #ffd700, #fff0a0, #daa520, #d4af37);
+  background-size: 200% auto;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.footer-links a:hover,
+.static-link:hover {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+  transform: translateX(6px);
+}
+
+.footer-links a:hover::after,
+.static-link:hover::after {
+  width: 100%;
+  animation: shimmer 1s ease infinite;
+}
+
+/* Shimmer animation for gold effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Hover gold effect for static links */
+.hover-gold {
+  cursor: pointer;
+}
+
+.hover-gold:hover {
+  color: #ffd700 !important;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+  transform: translateX(6px);
+}
+
+/* ===== CONTACT - FIXED RESPONSIVE ===== */
+.footer-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.contact-item {
+  display: flex;
+  gap: 10px;
+  font-size: 0.9rem;
+  align-items: flex-start;
+  color: rgba(255, 240, 244, 0.85);
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+.contact-item i {
+  margin-top: 3px;
+  color: #fff;
+  min-width: 16px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.contact-item span,
+.contact-item a {
+  color: rgba(255, 240, 244, 0.85);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.contact-item a {
+  cursor: pointer;
+}
+
+.contact-item:hover {
+  transform: translateX(5px);
+}
+
+.contact-item:hover i {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+  transform: scale(1.1);
+}
+
+.contact-item:hover span,
+.contact-item:hover a {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+}
+
+/* ===== CTA ===== */
+.footer-cta {
+  display: inline-block;
+  align-self: flex-start;
+  background: #ffffff;
+  color: #5a0f2d;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.footer-cta:hover {
+  background: linear-gradient(135deg, #d4af37, #ffd700, #daa520, #b8860b);
+  color: #2c0a18;
+  border-color: #ffd700;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(212, 175, 55, 0.4);
+  text-shadow: none;
+}
+
+/* ===== BOTTOM SECTION - CENTERED ===== */
+.footer-bottom {
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  padding-top: 30px;
+  margin-top: 10px;
+}
+
+.footer-brand-center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* AARNA Brand with Samarkan Font */
+.aarna-brand {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.aarna-name {
+  font-family: 'Samarkan', 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: bold;
+  letter-spacing: 4px;
+  display: block;
+  background: linear-gradient(135deg, #ffd700, #fff0a0, #d4af37, #ffd700);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  transition: all 0.3s ease;
+  margin-bottom: 8px;
+  animation: goldShine 3s ease infinite;
+}
+
+@keyframes goldShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.aarna-name:hover {
+  background: linear-gradient(135deg, #fff0a0, #ffd700, #fff0a0, #ffd700);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transform: scale(1.02);
+  animation: goldShine 1s ease infinite;
+}
+
+.aarna-tagline {
+  font-family: "Manrope", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #d4af37, #ffd700, #daa520);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: block;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.aarna-tagline:hover {
+  background: linear-gradient(135deg, #ffd700, #fff0a0, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 4px;
+}
+
+/* Footer Legal Center */
+.footer-legal-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.copyright {
+  font-size: 0.8rem;
+  background: linear-gradient(135deg, rgba(255, 240, 244, 0.7), rgba(255, 240, 244, 0.9));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.copyright:hover {
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.legal-links-center {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.legal-links-center a,
+.powered-by {
+  position: relative;
+  text-decoration: none;
+  font-size: 0.78rem;
+  background: linear-gradient(135deg, rgba(255, 240, 244, 0.7), rgba(255, 240, 244, 0.9));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.legal-links-center a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, #d4af37, #ffd700, #daa520);
+  transition: width 0.3s ease;
+}
+
+.legal-links-center a:hover {
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.legal-links-center a:hover::after {
+  width: 100%;
+}
+
+.separator {
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.powered-by {
+  cursor: default;
+}
+
+.powered-by:hover {
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ===== TABLET ===== */
+@media (max-width: 1024px) {
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+}
+
+/* ===== MOBILE - FIXED RESPONSIVE LOCATION ===== */
+@media (max-width: 768px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .footer-brand,
+  .footer-nav-group,
+  .footer-action {
+    align-items: center;
+    text-align: center;
+  }
+  
+  .footer-desc {
+    text-align: center;
+    max-width: 100%;
+  }
+  
+  .footer-socials {
+    justify-content: center;
+  }
+  
+  .footer-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .footer-nav-group:hover .footer-title::after {
+    width: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* FIXED: Contact section responsive */
+  .footer-contact-info {
+    align-items: center;
+    width: 100%;
+  }
+  
+  .contact-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .contact-item i {
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+  
+  .contact-item span,
+  .contact-item a {
+    text-align: center;
+    max-width: 100%;
+  }
+  
+  /* Location text specific fix */
+  .contact-item:first-child span {
+    display: inline-block;
+    max-width: 280px;
+    line-height: 1.5;
+  }
+  
+  .contact-item:hover {
+    transform: translateX(0) translateY(-2px);
+  }
+  
+  .footer-cta {
+    align-self: center;
+  }
+  
+  .footer-links a:hover,
+  .static-link:hover {
+    transform: translateX(0) translateY(-2px);
+  }
+}
+
+/* ===== SMALL MOBILE - EXTRA FIXES ===== */
+@media (max-width: 600px) {
+  .site-footer {
+    padding: 50px 0 24px;
+  }
+  
+  .aarna-name {
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+  }
+  
+  .aarna-tagline {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+  
+  .legal-links-center {
+    gap: 8px;
+  }
+  
+  .copyright,
+  .legal-links-center a,
+  .powered-by,
+  .separator {
+    font-size: 0.7rem;
+  }
+  
+  /* Contact location text fix for small mobile */
+  .contact-item:first-child span {
+    max-width: 240px;
+    font-size: 0.85rem;
+  }
+  
+  .contact-item span,
+  .contact-item a {
+    font-size: 0.85rem;
+  }
+}
+
+/* ===== VERY SMALL MOBILE ===== */
+@media (max-width: 480px) {
+  .footer-container {
+    padding: 0 18px;
+  }
+  
+  .footer-logo-image {
+    height: 64px;
+  }
+  
+  .footer-title {
+    font-size: 1.3rem;
+  }
+  
+  .footer-desc,
+  .footer-links a,
+  .static-link,
+  .contact-item {
+    font-size: 0.88rem;
+  }
+  
+  .footer-socials a {
+    width: 38px;
+    height: 38px;
+    font-size: 0.9rem;
+  }
+  
+  .footer-cta {
+    font-size: 0.76rem;
+    padding: 11px 20px;
+  }
+  
+  .aarna-name {
+    font-size: 2rem;
+    letter-spacing: 2px;
+  }
+  
+  .aarna-tagline {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+  }
+  
+  .legal-links-center {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .separator {
+    display: none;
+  }
+  
+  .copyright,
+  .legal-links-center a,
+  .powered-by {
+    font-size: 0.68rem;
+  }
+  
+  /* Contact location specific for very small devices */
+  .contact-item:first-child span {
+    max-width: 200px;
+    font-size: 0.82rem;
+  }
+  
+  .contact-item i {
+    font-size: 0.9rem;
+  }
+}
+
+/* ===== EXTRA SMALL DEVICES ===== */
+@media (max-width: 380px) {
+  .footer-container {
+    padding: 0 14px;
+  }
+  
+  .footer-logo-image {
+    height: 56px;
+  }
+  
+  .aarna-name {
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+  }
+  
+  .aarna-tagline {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+  
+  .copyright,
+  .legal-links-center a,
+  .powered-by {
+    font-size: 0.65rem;
+  }
+  
+  /* Final fix for very tiny screens */
+  .contact-item:first-child span {
+    max-width: 180px;
+    font-size: 0.78rem;
+  }
+  
+  .contact-item span,
+  .contact-item a {
+    font-size: 0.78rem;
+  }
+}
+
+/* Font import for Samarkan */
+@font-face {
+  font-family: 'Samarkan';
+  src: url('https://fonts.cdnfonts.com/css/samarkan') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}

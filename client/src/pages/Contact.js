@@ -1,0 +1,710 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, useAnimation, useInView } from 'framer-motion';
+import '../styles/Contact.css';
+import { useSettings } from '../hooks/useSettings';
+import { submitContact } from '../services/api';
+
+const EASE_OUT = [0.22, 1, 0.36, 1];
+
+/* ── Custom Hook for Scroll Reveal with Bidirectional Animation ── */
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('[data-reveal]');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.getAttribute('data-delay');
+            if (delay) {
+              entry.target.style.transitionDelay = `${delay}ms`;
+            }
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+    );
+
+    els.forEach((el) => observer.observe(el));
+
+    document.title = 'Contact Aarna | Wedding Destination';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute(
+        "content",
+        "Get in touch with Aarna to plan your dream wedding. Let's create something beautiful together."
+      );
+    }
+
+    return () => observer.disconnect();
+  }, []);
+}
+
+function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    eventType: '',
+    eventDate: '',
+    guestCount: '',
+    message: '',
+    checkIn: '',
+    checkOut: '',
+    adults: '',
+    children: '',
+    stayQuery: '',
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  // Get dynamic settings
+  const { settings, loading: settingsLoading } = useSettings();
+
+  // Refs for sections
+  const contactContentRef = useRef(null);
+  const mapRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  useScrollReveal();
+
+  // Animated section controls
+  const contactContentInView = useInView(contactContentRef, { once: true, amount: 0.25 });
+  const mapInView = useInView(mapRef, { once: true, amount: 0.3 });
+  const ctaInView = useInView(ctaRef, { once: true, amount: 0.4 });
+
+  const contactContentControls = useAnimation();
+  const mapControls = useAnimation();
+  const ctaControls = useAnimation();
+
+  // Trigger animations when sections come into view
+  useEffect(() => {
+    if (contactContentInView) {
+      contactContentControls.start('visible');
+    } else {
+      contactContentControls.start('hidden');
+    }
+  }, [contactContentInView, contactContentControls]);
+
+  useEffect(() => {
+    if (mapInView) {
+      mapControls.start('visible');
+    } else {
+      mapControls.start('hidden');
+    }
+  }, [mapInView, mapControls]);
+
+  useEffect(() => {
+    if (ctaInView) {
+      ctaControls.start('visible');
+    } else {
+      ctaControls.start('hidden');
+    }
+  }, [ctaInView, ctaControls]);
+
+  // Animation variants
+  const fadeUpVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: EASE_OUT }
+    }
+  };
+
+  const zoomInVariants = {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.8, ease: EASE_OUT }
+    }
+  };
+
+  const slideLeftVariants = {
+    hidden: { opacity: 0, x: -60 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.7, ease: EASE_OUT }
+    }
+  };
+
+  const slideRightVariants = {
+    hidden: { opacity: 0, x: 60 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.7, ease: EASE_OUT }
+    }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.12,
+        delayChildren: 0.1,
+      }
+    }
+  };
+
+  const staggerItem = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: EASE_OUT }
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const result = await submitContact(formData);
+      if (result.success) {
+        setSubmitted(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          eventType: '',
+          eventDate: '',
+          guestCount: '',
+          message: '',
+          checkIn: '',
+          checkOut: '',
+          adults: '',
+          children: '',
+          stayQuery: '',
+        });
+
+        setTimeout(() => {
+          setSubmitted(false);
+        }, 8000);
+      } else {
+        setSubmitError('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      setSubmitError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const addRipple = useCallback((e) => {
+    const btn = e.currentTarget;
+    const circle = document.createElement('span');
+    const rect = btn.getBoundingClientRect();
+    const point =
+      e.touches && e.touches.length > 0
+        ? e.touches[0]
+        : e.changedTouches && e.changedTouches.length > 0
+          ? e.changedTouches[0]
+          : e;
+
+    const size = Math.max(rect.width, rect.height) * 2;
+
+    circle.classList.add('ripple');
+    circle.style.width = `${size}px`;
+    circle.style.height = `${size}px`;
+    circle.style.left = `${point.clientX - rect.left - size / 2}px`;
+    circle.style.top = `${point.clientY - rect.top - size / 2}px`;
+
+    const prevRipple = btn.getElementsByClassName('ripple')[0];
+    if (prevRipple) prevRipple.remove();
+
+    btn.appendChild(circle);
+    circle.addEventListener('animationend', () => circle.remove());
+  }, []);
+
+  return (
+    <div className="contact-page">
+      {/* Hero Section */}
+      <motion.section
+        className="contact-hero"
+        style={{ backgroundImage: "url('/contact.png')" }}
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: EASE_OUT }}
+      >
+        <div className="hero-bg-overlay"></div>
+        <div className="container">
+          <div className="contact-hero-content" data-reveal>
+            <h1>Let's Create Your Dream Wedding</h1>
+            <div className="gold-line-center"></div>
+            <p>We are here to help plan every detail of your special day.</p>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Contact Information & Form */}
+      <motion.section
+        ref={contactContentRef}
+        className="contact-content-section"
+        variants={fadeUpVariants}
+        initial="hidden"
+        animate={contactContentControls}
+      >
+        <div className="container">
+          <div className="contact-grid">
+            {/* Contact Details - Slide from Left */}
+            <motion.div
+              className="contact-details-col"
+              variants={slideLeftVariants}
+              initial="hidden"
+              animate={contactContentControls}
+            >
+              <div className="details-card">
+                <div className="kicker">GET IN TOUCH</div>
+                <h2 className="serif">
+                  <span className="aarna-brand contact-aarna-brand">Aarna</span> Wedding Destination
+                </h2>
+                <div className="gold-rule"></div>
+
+                <p className="details-intro">
+                  We would love to hear about your celebration. Reach out to us for venue details,
+                  availability, and personalized wedding planning support.
+                </p>
+
+                <motion.div
+                  className="info-list"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate={contactContentControls}
+                >
+                  <motion.div className="info-item" variants={staggerItem}>
+                    <div className="info-icon">
+                      <i className="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div className="info-text">
+                      <h3>Our Location</h3>
+                      <p>Gungralchatra, Mysore-571130, Near Bangalore-Kushalnagar NH-275, Mysore, Karnataka, India.</p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div className="info-item" variants={staggerItem}>
+                    <div className="info-icon">
+                      <i className="fa-solid fa-phone"></i>
+                    </div>
+                    <div className="info-text">
+                      <h3>Call Us</h3>
+                      <p>
+                        <a href={`tel:${settings?.phone?.replace(/\D/g, '') || '9845122100'}`}>{settings?.phone || '98451 22100'}</a> |{' '}
+                        <a href={`tel:${settings?.phoneSecondary?.replace(/\D/g, '') || '9880942101'}`}>{settings?.phoneSecondary || '98809 42101'}</a>
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div className="info-item" variants={staggerItem}>
+                    <div className="info-icon">
+                      <i className="fa-solid fa-envelope"></i>
+                    </div>
+                    <div className="info-text">
+                      <h3>Email Us</h3>
+                      <p>
+                        <a href={`mailto:${settings?.email || 'aarnadestinations@gmail.com'}`}>
+                          {settings?.email || 'aarnadestinations@gmail.com'}
+                        </a>
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div className="info-item" variants={staggerItem}>
+                    <div className="info-icon">
+                      <i className="fa-solid fa-clock"></i>
+                    </div>
+                    <div className="info-text">
+                      <h3>Opening Hours</h3>
+                      <p>{settings?.openingHours || 'Monday to Sunday: 9:00 AM – 9:00 PM'}</p>
+                    </div>
+                  </motion.div>
+                </motion.div>
+
+                <motion.div
+                  className="contact-socials"
+                  variants={fadeUpVariants}
+                  initial="hidden"
+                  animate={contactContentControls}
+                >
+                  <span className="social-label">Follow Us</span>
+                  <div className="social-icons">
+                    <a
+                      href={settings?.social?.instagram || 'https://instagram.com'}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Instagram"
+                    >
+                      <i className="fa-brands fa-instagram"></i>
+                    </a>
+                    <a
+                      href={settings?.social?.facebook || 'https://facebook.com'}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Facebook"
+                    >
+                      <i className="fa-brands fa-facebook-f"></i>
+                    </a>
+                    <a
+                      href={settings?.social?.youtube || 'https://youtube.com'}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="YouTube"
+                    >
+                      <i className="fa-brands fa-youtube"></i>
+                    </a>
+                    <a
+                      href={settings?.social?.whatsapp || 'https://wa.me/919845122100'}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="WhatsApp"
+                    >
+                      <i className="fa-brands fa-whatsapp"></i>
+                    </a>
+                    <a
+                      href={`tel:${settings?.phone?.replace(/\D/g, '') || '9845122100'}`}
+                      aria-label="Call Us"
+                    >
+                      <i className="fa-solid fa-phone"></i>
+                    </a>
+                    <a
+                      href={`mailto:${settings?.email || 'aarnadestinations@gmail.com'}`}
+                      aria-label="Email Us"
+                    >
+                      <i className="fa-solid fa-envelope"></i>
+                    </a>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Inquiry Form - Slide from Right */}
+            <motion.div
+              className="contact-form-col"
+              variants={slideRightVariants}
+              initial="hidden"
+              animate={contactContentControls}
+            >
+              <div className="form-card">
+                {submitted ? (
+                  <motion.div
+                    className="success-message"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, ease: EASE_OUT }}
+                  >
+                    <div className="success-icon">
+                      <i className="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h3>Thank You!</h3>
+                    <p>
+                      {formData.eventType === 'book-your-stay'
+                        ? 'Your stay enquiry has been received. Our team will contact you shortly with availability and details.'
+                        : 'Your wedding enquiry has been received. Our team will contact you shortly to discuss your celebration.'
+                      }
+                    </p>
+                    <button
+                      className="btn-maroon"
+                      onClick={() => setSubmitted(false)}
+                      type="button"
+                      onMouseDown={addRipple}
+                      onTouchStart={addRipple}
+                    >
+                      Send Another Enquiry
+                    </button>
+                  </motion.div>
+                ) : (
+                  <>
+                    <h3 className="serif">
+                      {formData.eventType === 'book-your-stay'
+                        ? <>Book Your Stay at <span className="aarna-brand contact-aarna-brand">Aarna</span></>
+                        : <>Plan Your Wedding with <span className="aarna-brand contact-aarna-brand">Aarna</span></>
+                      }
+                    </h3>
+                    <p className="form-intro">
+                      {formData.eventType === 'book-your-stay'
+                        ? 'Share your stay details and we will get back to you with availability and packages.'
+                        : 'Share your details and let us begin creating your perfect wedding experience.'
+                      }
+                    </p>
+
+                    {submitError && (
+                      <div className="error-message" style={{ color: '#dc3545', marginBottom: '20px', padding: '10px', background: '#ffe6e6', borderRadius: '8px' }}>
+                        <i className="fa-solid fa-exclamation-triangle"></i> {submitError}
+                      </div>
+                    )}
+
+                    <motion.form
+                      onSubmit={handleSubmit}
+                      className="wedding-form"
+                      variants={staggerContainer}
+                      initial="hidden"
+                      animate={contactContentControls}
+                    >
+                      <motion.div className="form-row" variants={staggerItem}>
+                        <div className="form-group">
+                          <label htmlFor="name">Full Name *</label>
+                          <input
+                            id="name"
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            placeholder="Enter your full name"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="email">Email Address *</label>
+                          <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Enter your email address"
+                            required
+                          />
+                        </div>
+                      </motion.div>
+
+                      <motion.div className="form-row" variants={staggerItem}>
+                        <div className="form-group">
+                          <label htmlFor="phone">Phone Number *</label>
+                          <input
+                            id="phone"
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            placeholder="Enter your phone number"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="eventType">Book Your Event & Stay</label>
+                          <select
+                            id="eventType"
+                            name="eventType"
+                            value={formData.eventType}
+                            onChange={handleChange}
+                          >
+                            <option value="">Select event type</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="reception">Reception</option>
+                            <option value="engagement">Engagement</option>
+                            <option value="mehendi-sangeet">Mehendi / Sangeet</option>
+                            <option value="haldi">Haldi</option>
+                            <option value="book-your-stay">Book Your Stay</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                      </motion.div>
+
+                      {formData.eventType !== 'book-your-stay' && (
+                        <motion.div className="form-row" variants={staggerItem}>
+                          <div className="form-group">
+                            <label htmlFor="eventDate">Preferred Event Date</label>
+                            <input
+                              id="eventDate"
+                              type="date"
+                              name="eventDate"
+                              value={formData.eventDate}
+                              onChange={handleChange}
+                            />
+                          </div>
+
+                          <div className="form-group">
+                            <label htmlFor="guestCount">Estimated Guest Count</label>
+                            <input
+                              id="guestCount"
+                              type="number"
+                              name="guestCount"
+                              value={formData.guestCount}
+                              onChange={handleChange}
+                              placeholder="Enter expected guests"
+                              min="0"
+                            />
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {formData.eventType === 'book-your-stay' && (
+                        <>
+                          <motion.div className="form-row stay-dates-row" variants={staggerItem}>
+                            <div className="form-group">
+                              <label htmlFor="checkIn">Check-In Date</label>
+                              <input
+                                id="checkIn"
+                                type="date"
+                                name="checkIn"
+                                value={formData.checkIn}
+                                onChange={handleChange}
+                                required
+                              />
+                            </div>
+                            <div className="form-group">
+                              <label htmlFor="checkOut">Check-Out Date</label>
+                              <input
+                                id="checkOut"
+                                type="date"
+                                name="checkOut"
+                                value={formData.checkOut}
+                                onChange={handleChange}
+                                required
+                              />
+                            </div>
+                          </motion.div>
+
+                          <motion.div className="form-row" variants={staggerItem}>
+                            <div className="form-group">
+                              <label htmlFor="adults">Number of Adults</label>
+                              <input
+                                id="adults"
+                                type="number"
+                                name="adults"
+                                value={formData.adults}
+                                onChange={handleChange}
+                                placeholder="Enter number of adults"
+                                min="1"
+                                required
+                              />
+                            </div>
+                            <div className="form-group">
+                              <label htmlFor="children">Number of Children</label>
+                              <input
+                                id="children"
+                                type="number"
+                                name="children"
+                                value={formData.children}
+                                onChange={handleChange}
+                                placeholder="Enter number of children"
+                                min="0"
+                              />
+                            </div>
+                          </motion.div>
+
+                          <motion.div className="form-group" variants={staggerItem}>
+                            <label htmlFor="stayQuery">Additional Queries / Special Requests</label>
+                            <textarea
+                              id="stayQuery"
+                              name="stayQuery"
+                              rows="4"
+                              value={formData.stayQuery}
+                              onChange={handleChange}
+                              placeholder="Any specific room preferences, dietary needs, accessibility requirements, or other requests?"
+                            ></textarea>
+                          </motion.div>
+                        </>
+                      )}
+
+                      <motion.div className="form-group" variants={staggerItem}>
+                        <label htmlFor="message">
+                          {formData.eventType === 'book-your-stay'
+                            ? 'Additional Notes'
+                            : 'Your Vision / Special Requests'}
+                        </label>
+                        <textarea
+                          id="message"
+                          name="message"
+                          rows="5"
+                          value={formData.message}
+                          onChange={handleChange}
+                          placeholder={
+                            formData.eventType === 'book-your-stay'
+                              ? 'Any other information you would like to share with us?'
+                              : 'Tell us about your wedding vision, preferred style, and any special requirements.'
+                          }
+                        ></textarea>
+                      </motion.div>
+
+                      <motion.button
+                        type="submit"
+                        className="btn-maroon"
+                        disabled={isSubmitting}
+                        onMouseDown={addRipple}
+                        onTouchStart={addRipple}
+                        variants={staggerItem}
+                      >
+                        {isSubmitting ? (
+                          <><i className="fa-solid fa-spinner fa-spin"></i> Sending...</>
+                        ) : (
+                          <>{formData.eventType === 'book-your-stay'
+                            ? 'Send Stay Enquiry'
+                            : 'Send Wedding Enquiry'} <i className="fa-solid fa-paper-plane"></i></>
+                        )}
+                      </motion.button>
+                    </motion.form>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Map Section with Zoom In Animation */}
+      <motion.section
+        ref={mapRef}
+        className="map-section"
+        variants={zoomInVariants}
+        initial="hidden"
+        animate={mapControls}
+      >
+        <div className="container">
+          <div className="map-container" data-reveal>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3897.5!2d76.610274!3d12.334821!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3baf7b0b8b8b8b8b%3A0x8b8b8b8b8b8b8b8b!2sGungralchatra%2C%20Mysore%2C%20Karnataka%20571130!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+              width="100%"
+              height="450"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              title="Aarna Location Map - Gungralchatra, Mysore"
+            ></iframe>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* CTA Section with Fade Up Animation */}
+      <motion.section
+        ref={ctaRef}
+        className="wedding-cta"
+        variants={fadeUpVariants}
+        initial="hidden"
+        animate={ctaControls}
+      >
+        <div className="container">
+          <div className="cta-simple" data-reveal>
+            <h3>Ready to Begin Your Journey?</h3>
+            <p>
+              Let <span className="aarna-brand">Aarna</span> help you create a celebration filled
+              with elegance, beauty, and unforgettable memories.
+            </p>
+            <Link to="/" className="btn-maroon">
+              Explore Our Venues
+            </Link>
+          </div>
+        </div>
+      </motion.section>
+    </div>
+  );
+}
+
+export default Contact;

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "title": "Venue Arrangement",
+    "subtitle": "Elegant spaces for every celebration",
+    "description": "Gracefully arranged venue settings designed for weddings, receptions, and intimate celebrations with a refined premium feel.",
+    "image": "/venue_arrangement.png",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "2",
+    "title": "Catering Services",
+    "subtitle": "Tasteful menus with refined presentation",
+    "description": "Curated dining experiences with beautiful presentation, warm hospitality, and flavours your guests will remember.",
+    "image": "/catering.png",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "3",
+    "title": "Wedding Décor",
+    "subtitle": "Styled around your dream theme",
+    "description": "From floral styling to stage design, every décor detail is tailored to feel graceful, personal, and picture-perfect.",
+    "image": "/wedding_decor.png",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "4",
+    "title": "Lighting & Sound",
+    "subtitle": "Beautiful ambiance with seamless execution",
+    "description": "Professional lighting and sound arrangements that make every ritual, entry, and celebration feel polished and grand.",
+    "image": "/lighting_sound.png",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "5",
+    "title": "Event Planning",
+    "subtitle": "Smooth coordination from start to finish",
+    "description": "Thoughtful planning and careful coordination so each moment flows beautifully and your day feels effortless.",
+    "image": "/event_planning.png",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "6",
+    "title": "Room Booking",
+    "subtitle": "Luxury stays for guests and family",
+    "description": "Elegantly designed rooms with modern amenities. Complimentary breakfast included. Comfortable accommodation for your loved ones.",
+    "image": "/room_booking.png",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]

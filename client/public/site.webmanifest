@@ -1,0 +1,31 @@
+{
+  "name": "Aarna Wedding Destination",
+  "short_name": "Aarna",
+  "description": "Luxury wedding destination near Mysore - Where tradition meets trends",
+  "theme_color": "#5a0f2d",
+  "background_color": "#5a0f2d",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ]
+}

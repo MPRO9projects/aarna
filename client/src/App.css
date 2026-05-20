@@ -1,0 +1,378 @@
+/* ─────────────────────────────────────────────────────────
+   AARNA Wedding Destination · App Styles
+   ───────────────────────────────────────────────────────── */
+
+:root {
+  /* Brand Colors - Maroon & Gold Theme */
+  --primary: #D4AF37;        /* Gold */
+  --primary-light: #E5C76B;  /* Light Gold */
+  --primary-dark: #B8960C;   /* Deep Gold */
+  
+  --maroon: #40151e;         /* Deep Maroon */
+  --maroon-light: #5f2a35;   /* Light Maroon */
+  --maroon-dark: #2a0e14;    /* Dark Maroon */
+  
+  /* Text Colors */
+  --text-light: #FFFFFF;
+  --text-dark: #222222;
+  --text-muted: #666666;
+  
+  /* Backgrounds */
+  --bg-dark: #0a0a0a;
+  --bg-light: #f9f9f9;
+  --bg-white: #ffffff;
+  --bg-off-white: #f8f8f8;
+  --bg-charcoal: #f0f0f0;
+  
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', serif;
+  /* --font-sans: 'Montserrat', 'Inter', sans-serif; */
+  --font-sans: 'Libre Baskerville', serif;
+  
+  /* Spacing */
+  --section-padding: 100px 0;
+  --container-width: 1400px;
+  
+  /* Effects */
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 32px 80px rgba(0, 0, 0, 0.12);
+  --shadow-gold: 0 10px 40px rgba(212, 175, 55, 0.2);
+  
+  /* Glass Effect */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-dark-bg: rgba(10, 10, 10, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  
+  /* Transitions */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 0.3s;
+  --t-normal: 0.5s;
+  --t-slow: 0.8s;
+}
+
+/* ── Global Resets ─────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-white);
+  color: var(--text-dark);
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-dark);
+}
+
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+}
+
+/* ── App Layout ─────────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* ── Typography Utilities ────────────────────── */
+.kicker {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--primary);
+  margin-bottom: 15px;
+}
+
+.kicker-white {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--primary-light);
+  margin-bottom: 15px;
+}
+
+.serif {
+  font-family: var(--font-serif);
+}
+
+.gold-rule {
+  width: 60px;
+  height: 2px;
+  background: var(--primary);
+  margin: 25px 0 30px;
+}
+
+.gold-line-center {
+  width: 80px;
+  height: 2px;
+  background: var(--primary);
+  margin: 25px auto 30px;
+}
+
+/* ── Button Base Styles ──────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 40px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  border-radius: 40px;
+  transition: all var(--t-normal) var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+  border: 2px solid transparent;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-100%) skewX(-15deg);
+  transition: transform var(--t-slow) var(--ease-smooth);
+  z-index: -1;
+}
+
+.btn:hover::after {
+  transform: translateX(100%) skewX(-15deg);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--maroon);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background: var(--maroon-light);
+  border-color: var(--maroon-light);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-gold);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: var(--maroon);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-gold);
+}
+
+/* ── Scroll Reveal Animation ─────────────────── */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity var(--t-slow) var(--ease-smooth),
+              transform var(--t-slow) var(--ease-smooth);
+}
+
+[data-reveal].revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="left"] {
+  transform: translateX(-50px);
+}
+
+[data-reveal="right"] {
+  transform: translateX(50px);
+}
+
+[data-reveal="zoom"] {
+  transform: scale(0.95);
+}
+
+[data-reveal="left"].revealed,
+[data-reveal="right"].revealed,
+[data-reveal="zoom"].revealed {
+  transform: translateX(0) scale(1);
+}
+
+/* ── Ripple Effect ───────────────────────────── */
+.ripple {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4);
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: rippleAnim 0.8s ease-out forwards;
+}
+
+@keyframes rippleAnim {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+/* ── Floating Call Button (all pages) ─────────── */
+.floating-call-btn {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  max-width: 56px;
+  max-height: 56px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #6f1f3b;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 14px 34px rgba(64, 21, 30, 0.22);
+  z-index: 999;
+  overflow: hidden;
+  animation: floatingCallPulse 2.2s ease-in-out infinite;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.floating-call-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 18px 38px rgba(64, 21, 30, 0.28);
+}
+
+.floating-call-btn svg {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px;
+  min-height: 22px;
+  max-width: 22px;
+  max-height: 22px;
+  display: block;
+  flex: 0 0 22px;
+}
+
+.floating-call-btn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 1px solid rgba(111, 31, 59, 0.24);
+  animation: floatingCallRing 2.2s ease-out infinite;
+}
+
+.floating-call-btn.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@keyframes floatingCallPulse {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+
+@keyframes floatingCallRing {
+  0%   { transform: scale(0.9); opacity: 0.72; }
+  70%  { transform: scale(1.14); opacity: 0; }
+  100% { transform: scale(1.14); opacity: 0; }
+}
+
+@media (max-width: 767px) {
+  .floating-call-btn {
+    left: 14px;
+    bottom: 14px;
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    max-width: 52px;
+    max-height: 52px;
+  }
+
+  .floating-call-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px;
+    min-height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+    flex: 0 0 20px;
+  }
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+  .btn {
+    padding: 14px 30px;
+    font-size: 0.8rem;
+  }
+  
+  .kicker, .kicker-white {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    padding: 12px 25px;
+    font-size: 0.75rem;
+  }
+}

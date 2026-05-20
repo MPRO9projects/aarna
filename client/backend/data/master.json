@@ -1,0 +1,218 @@
+{
+  "sections": [
+    {
+      "id": 1,
+      "title": "Grand Celebration Hall",
+      "description": "A beautifully designed space ideal for lavish weddings and receptions, crafted for timeless celebrations and unforgettable moments.",
+      "longDescription": "Grand Celebration Hall is designed for lavish weddings, reception evenings, stage ceremonies, and large-scale family gatherings. The spacious layout supports elegant entry moments, premium seating flow, stage décor, and a refined guest experience throughout the celebration.",
+      "location": "Main Venue Block",
+      "eyebrow": "Signature Venue",
+      "image": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Spacious indoor celebration venue", "Ideal for weddings and receptions", "Designed for elegant stage setups"],
+      "stats": [
+        { "label": "Best For", "value": "Weddings & Receptions" },
+        { "label": "Experience", "value": "Grand Indoor Venue" },
+        { "label": "Mood", "value": "Classic Celebration" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "title": "Outdoor Lawn attached to the amphitheatre",
+      "description": "A scenic open setting perfect for mehendi, sangeet, and intimate gatherings, with a graceful atmosphere for elegant outdoor celebrations.",
+      "longDescription": "This outdoor lawn attached to the amphitheatre creates a graceful open-air celebration experience for mehendi, sangeet, welcome functions, and intimate wedding events. It combines scenic openness with an elegant event mood for memorable day and evening celebrations.",
+      "location": "Open Celebration Grounds",
+      "eyebrow": "Open-Air Venue",
+      "image": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Perfect for mehendi and sangeet events", "Open-air celebratory atmosphere", "Beautiful outdoor gathering experience"],
+      "stats": [
+        { "label": "Best For", "value": "Mehendi & Sangeet" },
+        { "label": "Experience", "value": "Open-Air Venue" },
+        { "label": "Mood", "value": "Scenic & Festive" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "title": "Dining Area",
+      "description": "Comfortable, spacious, and hygienic dining designed to offer a refined experience for your guests throughout the celebration.",
+      "longDescription": "The Dining Area is planned to deliver comfort, hygiene, and smooth hospitality for guests across every wedding event. It supports large gathering dining flow while maintaining a clean, organized, and refined setting for family and friends.",
+      "location": "Guest Hospitality Zone",
+      "eyebrow": "Hospitality Space",
+      "image": "https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Spacious guest dining setup", "Comfortable and hygienic experience", "Supports seamless service flow"],
+      "stats": [
+        { "label": "Best For", "value": "Guest Dining" },
+        { "label": "Experience", "value": "Comfort & Service" },
+        { "label": "Mood", "value": "Warm Hospitality" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "title": "Kalyani",
+      "description": "A serene and traditional water-feature setting that brings cultural charm and a sacred ambience to pre-wedding and ceremonial moments.",
+      "longDescription": "Kalyani brings a traditional and serene atmosphere that adds cultural grace to the venue experience. It is ideal for sacred, ritual-based, and pre-wedding moments where the setting itself becomes part of the celebration story.",
+      "location": "Traditional Courtyard",
+      "eyebrow": "Sacred Setting",
+      "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Traditional and serene ambience", "Ideal for ritual-based moments", "Adds cultural depth to celebrations"],
+      "stats": [
+        { "label": "Best For", "value": "Sacred Ritual Moments" },
+        { "label": "Experience", "value": "Traditional Setting" },
+        { "label": "Mood", "value": "Serene & Spiritual" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "title": "Temple",
+      "description": "A divine and peaceful temple space for sacred rituals, blessings, and spiritually meaningful wedding traditions.",
+      "longDescription": "The Temple offers a peaceful and divine atmosphere for blessings, sacred rituals, and spiritually meaningful wedding customs. It adds a devotional element to the venue and creates a beautiful setting for traditional ceremonies.",
+      "location": "Spiritual Venue Corner",
+      "eyebrow": "Divine Space",
+      "image": "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Suitable for sacred rituals and blessings", "Peaceful spiritual atmosphere", "Enhances traditional wedding customs"],
+      "stats": [
+        { "label": "Best For", "value": "Blessings & Rituals" },
+        { "label": "Experience", "value": "Temple Setting" },
+        { "label": "Mood", "value": "Divine & Peaceful" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 6,
+      "title": "Complimentary Rooms for Bride & Groom",
+      "description": "Elegantly prepared complimentary rooms for the bride and groom to relax, get ready, and enjoy comfort and privacy on their special day.",
+      "longDescription": "These complimentary rooms for the bride and groom are prepared for privacy, comfort, and a calm getting-ready experience. They support wedding-day preparation, relaxation, and personal moments before and after the main celebration events.",
+      "location": "Private Comfort Suite",
+      "eyebrow": "Luxury Comfort",
+      "image": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Private preparation and relaxation space", "Designed for bride and groom comfort", "Ideal for wedding-day readiness"],
+      "stats": [
+        { "label": "Best For", "value": "Bride & Groom Stay" },
+        { "label": "Experience", "value": "Comfort & Privacy" },
+        { "label": "Mood", "value": "Elegant & Calm" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 7,
+      "title": "Guest Accommodation Rooms",
+      "description": "Well-appointed guest accommodation rooms designed to offer convenience, comfort, and a pleasant stay for family and friends.",
+      "longDescription": "Guest Accommodation Rooms are designed to make family and friends feel comfortable, welcomed, and well cared for throughout the celebration. They provide convenient stay options and support a complete destination wedding experience.",
+      "location": "Stay & Hospitality Wing",
+      "eyebrow": "Guest Stay",
+      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Comfortable stay for family and guests", "Convenient on-site accommodation", "Supports destination wedding hosting"],
+      "stats": [
+        { "label": "Best For", "value": "Family & Guest Stay" },
+        { "label": "Experience", "value": "Convenient Accommodation" },
+        { "label": "Mood", "value": "Welcoming & Relaxed" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 8,
+      "title": "Well Equipped Kitchen",
+      "description": "A spacious and well equipped kitchen setup that supports seamless catering operations for weddings, celebrations, and large gatherings.",
+      "longDescription": "The Well Equipped Kitchen is built to support efficient catering operations for weddings and large gatherings. It helps maintain smooth food preparation, organized service execution, and consistent hospitality support behind every successful event.",
+      "location": "Service & Catering Zone",
+      "eyebrow": "Operational Support",
+      "image": "https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1600&q=80",
+      "imageName": "",
+      "highlights": ["Supports seamless catering operations", "Spacious and efficient kitchen setup", "Built for large celebration requirements"],
+      "stats": [
+        { "label": "Best For", "value": "Catering Support" },
+        { "label": "Experience", "value": "Operational Efficiency" },
+        { "label": "Mood", "value": "Organized & Functional" }
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "services": [
+    {
+      "id": 1,
+      "title": "Venue Arrangement",
+      "subtitle": "Elegant spaces for every celebration",
+      "description": "Gracefully arranged venue settings designed for weddings, receptions, and intimate celebrations with a refined premium feel.",
+      "image": "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1800&q=80",
+      "imageName": "",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "title": "Catering Services",
+      "subtitle": "Tasteful menus with refined presentation",
+      "description": "Curated dining experiences with beautiful presentation, warm hospitality, and flavours your guests will remember.",
+      "image": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1800&q=80",
+      "imageName": "",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "title": "Wedding Décor",
+      "subtitle": "Styled around your dream theme",
+      "description": "From floral styling to stage design, every décor detail is tailored to feel graceful, personal, and picture-perfect.",
+      "image": "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1800&q=80",
+      "imageName": "",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "title": "Lighting & Sound",
+      "subtitle": "Beautiful ambiance with seamless execution",
+      "description": "Professional lighting and sound arrangements that make every ritual, entry, and celebration feel polished and grand.",
+      "image": "https://images.unsplash.com/photo-1513278974582-3e1b4a4fa21d?auto=format&fit=crop&w=1800&q=80",
+      "imageName": "",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "title": "Event Planning",
+      "subtitle": "Smooth coordination from start to finish",
+      "description": "Thoughtful planning and careful coordination so each moment flows beautifully and your day feels effortless.",
+      "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1800&q=80",
+      "imageName": "",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 6,
+      "title": "Room Booking",
+      "subtitle": "Luxury stays for guests and family",
+      "description": "Elegantly designed rooms with modern amenities. Complimentary breakfast included. Book independently without any event requirement. Comfortable accommodation for your loved ones.",
+      "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=80",
+      "imageName": "",
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "gallery": [],
+  "contacts": [],
+  "settings": {
+    "siteName": "Aarna",
+    "phone": "+91 9845122100",
+    "phoneSecondary": "+91 9880942101",
+    "email": "aarnadestinations@gmail.com",
+    "address": "Gungralchatra, Mysore-571130, Near Bangalore-Kushalnagar NH-275, Mysore, Karnataka, India.",
+    "social": {
+      "instagram": "https://instagram.com/aarnaresort",
+      "facebook": "https://facebook.com/aarnaresort",
+      "youtube": "https://youtube.com/aarnaresort",
+      "whatsapp": "https://wa.me/919845122100"
+    },
+    "openingHours": "Monday to Sunday: 9:00 AM – 9:00 PM",
+    "heroImage": "https://images.unsplash.com/photo-1519741497674-611481863552",
+    "aboutImage": "https://images.unsplash.com/photo-1519225421980-715cb0215aed"
+  },
+  "nextSectionId": 9,
+  "nextGalleryId": 1,
+  "nextServiceId": 7,
+  "nextContactId": 1
+}

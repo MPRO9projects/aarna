@@ -1,0 +1,462 @@
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gilda+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+@font-face {
+  font-family: 'Samarkan';
+  src: url('../Assets/fonts/Samarkan.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --maroon: #6f1f3b;
+  --maroon-dark: #4e1026;
+  --maroon-soft: #893a49;
+  --maroon-light: #a24f60;
+  --text-dark: #111111;
+  --text-soft: #3b2a30;
+  --text-light: #ffffff;
+  --bg-white: #ffffff;
+  --bg-soft: #f8f1f2;
+  --bg-cream: #fbf7f8;
+
+  --font-brand: 'Samarkan', serif;
+  --font-heading: 'Cormorant Garamond', serif;
+  /* --font-body: 'Manrope', sans-serif; */
+  --font-body: 'Gilda Display', serif;
+
+  --radius-pill: 999px;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-maroon: 0 16px 38px rgba(111, 31, 59, 0.18);
+  --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  color: var(--text-dark);
+  background: var(--bg-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* ============================================
+   GLOBAL AARNA BRAND STYLES - EXTRA LARGE & HIGHLIGHTED
+   ============================================ */
+
+/* Base style for all AARNA brand text */
+.brand-font {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--maroon);
+  display: inline-block;
+  position: relative;
+  text-shadow: 0 2px 12px rgba(111, 31, 59, 0.15);
+}
+
+/* Optional: Add a subtle highlight effect */
+.brand-font::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--maroon), transparent);
+  opacity: 0.3;
+  transform: scaleX(0.8);
+  transition: transform 0.3s ease;
+}
+
+.brand-font:hover::after {
+  transform: scaleX(1);
+}
+
+/* ============================================
+   RESPONSIVE FONT SIZES FOR AARNA - LARGER VERSION
+   ============================================ */
+
+/* Large Desktop (1400px+) */
+@media (min-width: 1400px) {
+  .brand-font {
+    font-size: 4rem;
+  }
+}
+
+/* Desktop (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .brand-font {
+    font-size: 3.8rem;
+  }
+}
+
+/* Tablet Landscape (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .brand-font {
+    font-size: 3.5rem;
+  }
+}
+
+/* Tablet Portrait (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .brand-font {
+    font-size: 3rem;
+  }
+}
+
+/* Mobile Landscape (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .brand-font {
+    font-size: 2.5rem;
+  }
+}
+
+/* Mobile Portrait (375px - 575px) */
+@media (min-width: 375px) and (max-width: 575px) {
+  .brand-font {
+    font-size: 2.2rem;
+  }
+}
+
+/* Small Mobile (up to 374px) */
+@media (max-width: 374px) {
+  .brand-font {
+    font-size: 1.9rem;
+  }
+}
+
+/* ============================================
+   HERO SECTION - AARNA WEDDING DESTINATION
+   ============================================ */
+
+.hero-tagline {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero-tagline .brand-font {
+  font-size: 4rem;
+  margin-right: 0.15em;
+  letter-spacing: 0.1em;
+}
+
+.hero-tagline span:not(.brand-font) {
+  font-size: 1.1rem;
+  letter-spacing: 0.25em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+/* Responsive Hero Tagline */
+@media (min-width: 1400px) {
+  .hero-tagline .brand-font {
+    font-size: 4.5rem;
+  }
+  .hero-tagline span:not(.brand-font) {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 1199px) {
+  .hero-tagline .brand-font {
+    font-size: 3.5rem;
+  }
+  .hero-tagline span:not(.brand-font) {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 991px) {
+  .hero-tagline .brand-font {
+    font-size: 3rem;
+  }
+  .hero-tagline span:not(.brand-font) {
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-tagline {
+    justify-content: center;
+  }
+  .hero-tagline .brand-font {
+    font-size: 2.5rem;
+  }
+  .hero-tagline span:not(.brand-font) {
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-tagline .brand-font {
+    font-size: 2rem;
+  }
+  .hero-tagline span:not(.brand-font) {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+  }
+}
+
+/* ============================================
+   CTA SECTION - BEGIN YOUR JOURNEY WITH AARNA
+   ============================================ */
+
+.cta-kicker {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.cta-kicker .brand-font {
+  font-size: 4rem;
+  margin-left: 0.15em;
+  letter-spacing: 0.1em;
+}
+
+.cta-kicker span:not(.brand-font) {
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+/* Responsive CTA Kicker */
+@media (min-width: 1400px) {
+  .cta-kicker .brand-font {
+    font-size: 4.5rem;
+  }
+  .cta-kicker span:not(.brand-font) {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 1199px) {
+  .cta-kicker .brand-font {
+    font-size: 3.5rem;
+  }
+  .cta-kicker span:not(.brand-font) {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 991px) {
+  .cta-kicker .brand-font {
+    font-size: 3rem;
+  }
+  .cta-kicker span:not(.brand-font) {
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+  }
+}
+
+@media (max-width: 768px) {
+  .cta-kicker .brand-font {
+    font-size: 2.5rem;
+  }
+  .cta-kicker span:not(.brand-font) {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-kicker .brand-font {
+    font-size: 2rem;
+  }
+  .cta-kicker span:not(.brand-font) {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* ============================================
+   SPLASH SCREEN - AARNA LETTERS (EXTRA LARGE)
+   ============================================ */
+
+.hero-word {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.3rem, 1.2vw, 1.5rem);
+  flex-wrap: wrap;
+}
+
+.intro-letter {
+  opacity: 0;
+  transform: translateY(36px) scale(0.92);
+  font-family: var(--font-brand);
+  font-size: clamp(7rem, 16vw, 14rem);
+  color: var(--maroon);
+  letter-spacing: 0.04em;
+  text-shadow: 0 12px 28px rgba(111, 31, 59, 0.18);
+  animation: introLetterFast 0.66s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Responsive Splash Screen */
+@media (max-width: 768px) {
+  .intro-letter {
+    font-size: clamp(5rem, 12vw, 9rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .intro-letter {
+    font-size: clamp(3.5rem, 10vw, 6rem);
+  }
+}
+
+/* ============================================
+   HIGHLIGHT TEXT CLASS
+   ============================================ */
+
+.highlight {
+  color: var(--maroon);
+  font-weight: 700;
+  display: inline-block;
+  font-size: inherit;
+}
+
+.highlight.brand-font {
+  font-family: var(--font-brand);
+  font-size: 1.2em;
+  letter-spacing: 0.08em;
+}
+
+/* ============================================
+   MAROON TEXT UTILITY
+   ============================================ */
+
+.maroon-text {
+  color: var(--maroon);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes introLetterFast {
+  0% {
+    opacity: 0;
+    transform: translateY(36px) scale(0.92);
+    filter: blur(7px);
+  }
+  60% {
+    opacity: 0.95;
+    transform: translateY(-2px) scale(1.02);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeRight {
+  from {
+    opacity: 0;
+    transform: translateX(-22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes titleRise {
+  0% {
+    opacity: 0;
+    transform: translateY(44px);
+  }
+  75% {
+    opacity: 0.95;
+    transform: translateY(-3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dotPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(111, 31, 59, 0.22);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(111, 31, 59, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(111, 31, 59, 0);
+  }
+}
+
+@keyframes rippleAnim {
+  to {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes scrollCue {
+  0% {
+    opacity: 0.2;
+    transform: scaleY(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0.2;
+    transform: scaleY(0.7);
+  }
+}
