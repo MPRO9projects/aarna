@@ -26,21 +26,61 @@ This repository is used to store the full project source code, documentation, ba
 ### Frontend
 
 - React `19.2.4`
+  React is the main frontend library used to build the user interface. In this project, it is used to create reusable page components, shared UI sections, admin panel screens, and interactive behavior across the website.
+- React DOM `19.2.4`
+  React DOM connects React components to the browser DOM. In this project, it is responsible for rendering the React application into the web page so users can interact with the frontend.
 - React Router DOM `7.13.1`
+  React Router DOM is used for frontend navigation. In this project, it manages movement between pages such as Home, About, Contact, Privacy Policy, Terms of Service, and the Admin Panel. The project uses `HashRouter`, which is why URLs appear with `#/` in production.
 - React Scripts `5.0.1`
+  React Scripts provides the standard Create React App development and build tooling. It is responsible for running the development server, building the production version, and supporting the frontend test workflow.
 - Framer Motion `12.38.0`
+  Framer Motion is used for smooth UI animations and transitions. In this project, it helps create polished motion effects for page sections, transitions, and user interaction elements.
 - GSAP `3.14.2`
+  GSAP is an advanced animation library used for richer motion behavior. In this project, it supports more customized visual animation effects where fine control over timing and movement is needed.
 - AOS `2.3.4`
+  AOS stands for Animate On Scroll. It is used to trigger animations when users scroll through the page, helping sections appear in a more engaging and modern way.
 - Lucide React `1.7.0`
+  Lucide React provides icon components for the React frontend. In this project, it is used to display clean scalable icons inside the user interface where visual indicators are needed.
+- ColorThief `3.3.1`
+  ColorThief is a color extraction library. It is typically used when a project needs to derive color palettes from images so the interface can react to the uploaded or displayed media in a visually consistent way.
+- Web Vitals `2.1.4`
+  Web Vitals is used for performance measurement. In this project, it supports collection of frontend performance metrics such as loading and responsiveness indicators through `reportWebVitals.js`.
+- Testing Library DOM `10.4.1`
+  This library provides low-level utilities for testing DOM behavior. It helps the frontend test setup interact with rendered elements in a user-focused way.
+- Testing Library Jest DOM `6.9.1`
+  Jest DOM adds custom test matchers such as checking whether an element is visible or present in the document. It improves readability of frontend test assertions.
+- Testing Library React `16.3.2`
+  This library is used to test React components by rendering them and verifying behavior from the user's perspective. In this project, it supports the frontend test file setup.
+- Testing Library User Event `13.5.0`
+  User Event simulates realistic user interactions such as clicks and typing. It is useful for testing forms, buttons, and navigation flows more accurately than manual event dispatching.
 
 ### Backend
 
 - Node.js
+  Node.js is the runtime used to execute the backend JavaScript code. In this project, it runs the Express server, handles API requests, reads and writes JSON data files, and manages uploaded media files.
 - Express `4.18.2`
+  Express is the backend web framework used to build the API. In this project, it defines endpoints for sections, services, gallery items, contacts, settings, analytics, and site media operations.
 - Multer `1.4.5-lts.1`
+  Multer is used for handling file uploads in the backend. In this project, it processes images and video uploads from the admin panel and stores them in the `backend/uploads/` folder.
 - CORS `2.8.5`
+  CORS enables the frontend and backend to communicate when they are running on different origins during development or deployment. In this project, it allows the React frontend to send requests to the Express backend API.
 - UUID `9.0.0`
+  UUID is used to generate unique identifiers. In this project, it creates unique IDs for records such as sections, services, gallery items, contacts, and analytics entries, and also helps generate unique upload file names.
 - Nodemon `3.0.2` for development
+  Nodemon is a development tool that automatically restarts the backend server whenever backend files change. This makes backend development faster because you do not need to restart the server manually after every update.
+- File System (`fs`) built-in module
+  The Node.js `fs` module is used to read and write the JSON data files stored under `backend/data/`. It is a core part of how this backend saves sections, services, contacts, settings, and analytics without using a database.
+- Path (`path`) built-in module
+  The Node.js `path` module is used to safely build file and folder paths. In this project, it helps resolve upload locations, data file locations, and static asset paths in a cross-platform way.
+
+## Supporting Tooling and Configuration
+
+- ESLint configuration from React Scripts
+  The frontend uses the standard React Scripts ESLint setup to help catch common code issues and maintain code quality.
+- Browserlist configuration
+  The frontend includes a `browserslist` configuration in `client/package.json` to define which browsers the production and development builds should support.
+- Proxy setting in `client/package.json`
+  The frontend includes a proxy setting so local API calls can be forwarded to the backend during development.
 
 ## Main Project Structure
 
