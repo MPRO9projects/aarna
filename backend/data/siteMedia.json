@@ -5,8 +5,13 @@
   "heroComingSoon": "Crafted for elegant weddings, refined celebrations, and unforgettable memories.",
   "heroVideoLandscape": "",
   "heroVideoPortrait": "",
-  "eventMainImage": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1600&q=80",
-  "eventFloatImage": "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=80",
+  "eventMainImage": "/first.png",
+  "eventFloatImage": "/second.png",
   "stayMainImage": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80",
-  "stayFloatImage": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"
+  "stayFloatImage": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+  "aboutHeroImage": "/about-hero.jpg",
+  "aboutIntroMainImage": "/first.png",
+  "aboutIntroFloatImage": "/second.png",
+  "aboutPromiseImage": "https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82",
+  "contactHeroImage": "/contact.png"
 }

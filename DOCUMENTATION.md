@@ -1,100 +1,98 @@
-# AARNA WEBSITE Documentation
+# AARNA Website
+## Corporate Project Documentation
 
-## Project Overview
+## 1. Executive Summary
 
-AARNA WEBSITE is a full-stack website project built for a hospitality and events brand. It contains:
+The AARNA Website is a full-stack digital platform developed for a hospitality and wedding destination brand. The solution presents Aarna as a premium venue for weddings, celebrations, and guest stays, while also enabling internal content management through an administrative interface.
 
-- a React frontend in `client/`
-- a Node.js + Express backend in `backend/`
-- JSON-based content storage in `backend/data/`
-- uploaded media storage in `backend/uploads/`
-- an admin panel for managing sections, services, gallery items, settings, site media, contacts, and analytics
+The project combines a React-based frontend with a Node.js and Express backend. It supports dynamic content presentation, media management, enquiry capture, visitor analytics, and operational updates without requiring frequent code changes for routine business content.
 
-The project is designed so non-technical users can update much of the website content through the admin panel instead of editing code manually.
+This document is intended as a formal project submission and provides a business-level and technical overview of the delivered solution, its architecture, key capabilities, deployment model, current limitations, and recommendations for future enhancement.
 
-## GitHub Repository Details
+## 2. Project Objective
 
-- Repository name: `aarna`
-- GitHub owner: `infompro9-maker`
-- Repository URL: `https://github.com/infompro9-maker/aarna`
-- Main branch: `main`
+The primary objective of this project is to provide Aarna with:
 
-This repository is used to store the full project source code, documentation, backend files, frontend files, and project history.
+- a professional digital presence aligned with its premium brand positioning
+- a responsive website for prospective customers across desktop and mobile devices
+- a structured enquiry flow for weddings, events, and stays
+- an internal content management capability through an admin panel
+- a maintainable architecture for future content and feature expansion
 
-## Tech Stack
+## 3. Business Scope
+
+The implemented website supports the following business functions:
+
+- present Aarna as a wedding destination and hospitality brand
+- showcase venue identity, service offerings, and brand storytelling
+- allow visitors to contact the business and submit enquiries
+- support internal administrators in updating major website content
+- store and organize media assets used across the site
+- capture visitor activity for basic analytics and reporting
+
+## 4. Solution Overview
+
+The delivered application is a full-stack website consisting of:
+
+- a frontend web application built in React
+- a backend API built with Node.js and Express
+- JSON-based file storage for content and administrative records
+- file-based media upload handling for site imagery and video references
+
+The solution is designed to reduce dependency on direct source-code edits for regular content updates. Administrative users can manage sections, services, gallery items, settings, and media through the admin interface.
+
+## 5. Technology Stack
 
 ### Frontend
 
 - React `19.2.4`
-  React is the main frontend library used to build the user interface. In this project, it is used to create reusable page components, shared UI sections, admin panel screens, and interactive behavior across the website.
 - React DOM `19.2.4`
-  React DOM connects React components to the browser DOM. In this project, it is responsible for rendering the React application into the web page so users can interact with the frontend.
 - React Router DOM `7.13.1`
-  React Router DOM is used for frontend navigation. In this project, it manages movement between pages such as Home, About, Contact, Privacy Policy, Terms of Service, and the Admin Panel. The project uses `HashRouter`, which is why URLs appear with `#/` in production.
 - React Scripts `5.0.1`
-  React Scripts provides the standard Create React App development and build tooling. It is responsible for running the development server, building the production version, and supporting the frontend test workflow.
 - Framer Motion `12.38.0`
-  Framer Motion is used for smooth UI animations and transitions. In this project, it helps create polished motion effects for page sections, transitions, and user interaction elements.
 - GSAP `3.14.2`
-  GSAP is an advanced animation library used for richer motion behavior. In this project, it supports more customized visual animation effects where fine control over timing and movement is needed.
 - AOS `2.3.4`
-  AOS stands for Animate On Scroll. It is used to trigger animations when users scroll through the page, helping sections appear in a more engaging and modern way.
 - Lucide React `1.7.0`
-  Lucide React provides icon components for the React frontend. In this project, it is used to display clean scalable icons inside the user interface where visual indicators are needed.
 - ColorThief `3.3.1`
-  ColorThief is a color extraction library. It is typically used when a project needs to derive color palettes from images so the interface can react to the uploaded or displayed media in a visually consistent way.
 - Web Vitals `2.1.4`
-  Web Vitals is used for performance measurement. In this project, it supports collection of frontend performance metrics such as loading and responsiveness indicators through `reportWebVitals.js`.
-- Testing Library DOM `10.4.1`
-  This library provides low-level utilities for testing DOM behavior. It helps the frontend test setup interact with rendered elements in a user-focused way.
-- Testing Library Jest DOM `6.9.1`
-  Jest DOM adds custom test matchers such as checking whether an element is visible or present in the document. It improves readability of frontend test assertions.
-- Testing Library React `16.3.2`
-  This library is used to test React components by rendering them and verifying behavior from the user's perspective. In this project, it supports the frontend test file setup.
-- Testing Library User Event `13.5.0`
-  User Event simulates realistic user interactions such as clicks and typing. It is useful for testing forms, buttons, and navigation flows more accurately than manual event dispatching.
+- React Testing Library and related testing utilities
 
 ### Backend
 
 - Node.js
-  Node.js is the runtime used to execute the backend JavaScript code. In this project, it runs the Express server, handles API requests, reads and writes JSON data files, and manages uploaded media files.
 - Express `4.18.2`
-  Express is the backend web framework used to build the API. In this project, it defines endpoints for sections, services, gallery items, contacts, settings, analytics, and site media operations.
-- Multer `1.4.5-lts.1`
-  Multer is used for handling file uploads in the backend. In this project, it processes images and video uploads from the admin panel and stores them in the `backend/uploads/` folder.
 - CORS `2.8.5`
-  CORS enables the frontend and backend to communicate when they are running on different origins during development or deployment. In this project, it allows the React frontend to send requests to the Express backend API.
+- Multer `1.4.5-lts.1`
 - UUID `9.0.0`
-  UUID is used to generate unique identifiers. In this project, it creates unique IDs for records such as sections, services, gallery items, contacts, and analytics entries, and also helps generate unique upload file names.
 - Nodemon `3.0.2` for development
-  Nodemon is a development tool that automatically restarts the backend server whenever backend files change. This makes backend development faster because you do not need to restart the server manually after every update.
-- File System (`fs`) built-in module
-  The Node.js `fs` module is used to read and write the JSON data files stored under `backend/data/`. It is a core part of how this backend saves sections, services, contacts, settings, and analytics without using a database.
-- Path (`path`) built-in module
-  The Node.js `path` module is used to safely build file and folder paths. In this project, it helps resolve upload locations, data file locations, and static asset paths in a cross-platform way.
 
-## Supporting Tooling and Configuration
+### Data and Storage
 
-- ESLint configuration from React Scripts
-  The frontend uses the standard React Scripts ESLint setup to help catch common code issues and maintain code quality.
-- Browserlist configuration
-  The frontend includes a `browserslist` configuration in `client/package.json` to define which browsers the production and development builds should support.
-- Proxy setting in `client/package.json`
-  The frontend includes a proxy setting so local API calls can be forwarded to the backend during development.
+- JSON file storage under `backend/data/`
+- uploaded media storage under `backend/uploads/`
 
-## Main Project Structure
+## 6. Application Architecture
+
+The application follows a simple client-server architecture:
+
+1. The React frontend renders public-facing pages and the admin interface.
+2. The frontend consumes backend APIs for sections, services, settings, gallery, contact records, analytics, and site media.
+3. The Express backend handles API requests, file uploads, and JSON-based persistence.
+4. Uploaded media files are stored in the backend uploads directory and served through static file routing.
+
+### Architectural Characteristics
+
+- lightweight full-stack implementation
+- no relational or document database dependency
+- suitable for low-to-moderate administrative data volume
+- easy to deploy in environments where file-based storage is acceptable
+
+## 7. Project Structure
 
 ```text
 AARNA-WEBISTE/
 |-- backend/
 |   |-- data/
-|   |   |-- analytics.json
-|   |   |-- contacts.json
-|   |   |-- gallery.json
-|   |   |-- sections.json
-|   |   |-- services.json
-|   |   |-- settings.json
-|   |   `-- siteMedia.json
 |   |-- uploads/
 |   |-- package.json
 |   `-- server.js
@@ -106,30 +104,73 @@ AARNA-WEBISTE/
 |   |   |-- pages/
 |   |   |-- services/
 |   |   `-- styles/
-|   |-- package.json
-|   `-- .gitignore
+|   `-- package.json
 |-- .gitignore
 `-- DOCUMENTATION.md
 ```
 
-## Core Features
+## 8. Delivered Functional Modules
 
-- Responsive brand website
-- Home page powered by backend section data
-- About and contact pages
-- Privacy policy and terms pages
-- Hash-based routing for frontend navigation
-- Floating call-to-action button
-- Gallery and services content management
-- Contact form submission storage
-- Site settings management
-- Site media upload and replacement
-- Visitor analytics tracking
-- Admin panel for content operations
+### 8.1 Public Website
 
-## Frontend Routes
+The public website currently includes:
 
-The frontend uses `HashRouter`, so production/admin URLs commonly appear with `#/`.
+- Home page
+- About page
+- Contact page
+- Privacy Policy page
+- Terms of Service page
+
+The website uses `HashRouter`, so production routes use the `#/` pattern.
+
+### 8.2 Brand and Experience Presentation
+
+The public-facing experience includes:
+
+- animated hero and content presentation
+- visually rich storytelling sections
+- responsive layouts
+- floating call-to-action support
+- premium wedding and hospitality brand positioning
+
+### 8.3 Enquiry and Contact Management
+
+The Contact page supports structured enquiry capture. Submitted records are stored by the backend and are retrievable through admin endpoints.
+
+The current backend supports:
+
+- `POST /api/contact`
+- `GET /api/admin/contacts`
+- `PUT /api/admin/contacts/:id/read`
+- `DELETE /api/admin/contacts/:id`
+
+### 8.4 Content Administration
+
+The admin panel supports management of:
+
+- sections
+- services
+- gallery items
+- contact submissions
+- settings
+- site media
+- analytics data visibility
+
+### 8.5 Media Management
+
+The system supports upload and replacement of major site media assets, including hero and page-specific images.
+
+### 8.6 Analytics
+
+The backend records page visits and returns summary analytics for reporting purposes, including:
+
+- total visits
+- recent visits
+- page-level visit counts
+- device distribution
+- daily trend data
+
+## 9. Frontend Routing
 
 ### Public Routes
 
@@ -143,43 +184,12 @@ The frontend uses `HashRouter`, so production/admin URLs commonly appear with `#
 
 - `/admin`
 
-Production examples:
+### Production Route Examples
 
 - Website: `https://aarna.net.in/#/`
 - Admin: `https://aarna.net.in/#/admin`
 
-## Frontend Pages and Main UI Modules
-
-### Pages Present in `client/src/pages/`
-
-- `Home.js`
-- `About.js`
-- `Contact.js`
-- `PrivacyPolicy.js`
-- `TermsOfService.js`
-- `Gallery.js`
-- `Admin/AdminPanel.js`
-- `DynamicPage.js`
-
-### Shared Components Present in `client/src/components/`
-
-- `Header.js`
-- `Footer.js`
-- `ScrollToTop.js`
-- `FloatingContact.js`
-
-### Hooks Present in `client/src/hooks/`
-
-- `useGallery.js`
-- `useSections.js`
-- `useService.js`
-- `useSettings.js`
-
-### Important Note About Routing
-
-Some page files exist in the codebase, such as `Gallery.js` and `DynamicPage.js`, but they are not currently wired into the active route list in [client/src/App.js](/d:/AARNA-WEBISTE/AARNA-WEBISTE/client/src/App.js). If those pages are intended to be public, routes still need to be added explicitly.
-
-## Backend API Endpoints
+## 10. Backend API Coverage
 
 ### Sections
 
@@ -223,136 +233,27 @@ Some page files exist in the codebase, such as `Gallery.js` and `DynamicPage.js`
 - `GET /api/site-media`
 - `PUT /api/site-media`
 
-## Data Files Used by the Backend
+## 11. Data Storage Model
 
-All primary site content is stored in JSON files under `backend/data/`.
+The backend stores application data in JSON files located in `backend/data/`.
 
-- `sections.json`: home page sections and section-level content
-- `services.json`: about/services entries
-- `gallery.json`: gallery item records
-- `contacts.json`: contact form submissions
-- `settings.json`: shared site details like phone, email, address, social links
-- `siteMedia.json`: hero and other major media references
-- `analytics.json`: visit tracking data used in the admin dashboard
+Primary files include:
 
-## Current Settings Data Shape
+- `sections.json`
+- `services.json`
+- `gallery.json`
+- `contacts.json`
+- `settings.json`
+- `siteMedia.json`
+- `analytics.json`
 
-The current root backend settings file at [backend/data/settings.json](/d:/AARNA-WEBISTE/AARNA-WEBISTE/backend/data/settings.json) currently contains:
+This design simplifies deployment and maintenance for small-scale administrative workloads, but it should be treated as a lightweight content store rather than an enterprise-grade database solution.
 
-- `siteName`
-- `phone`
-- `email`
-- `address`
-- `socialLinks`
+## 12. Settings and Media Notes
 
-The frontend fallback hook in [client/src/hooks/useSettings.js](/d:/AARNA-WEBISTE/AARNA-WEBISTE/client/src/hooks/useSettings.js) also expects additional values such as:
+The current settings model in the backend is smaller than the fallback model expected by the frontend. The frontend hook merges API data with defaults, which keeps the site functional, but long-term maintainability would improve if both structures were standardized.
 
-- `phoneSecondary`
-- `openingHours`
-- `social`
-
-Because of that, keeping the backend settings structure and frontend fallback structure aligned will make maintenance easier.
-
-## Admin Panel Capabilities
-
-The admin panel is implemented in [client/src/pages/Admin/AdminPanel.js](/d:/AARNA-WEBISTE/AARNA-WEBISTE/client/src/pages/Admin/AdminPanel.js).
-
-It currently supports:
-
-- analytics viewing with auto-refresh
-- create, edit, and delete operations for home sections
-- create, edit, and delete operations for services
-- create and delete operations for gallery items
-- contact list viewing, mark-as-read, and delete
-- settings updates
-- page media uploads and replacements
-
-## Installation and Setup
-
-### Prerequisites
-
-- Node.js 18+ recommended
-- npm
-
-### Backend Setup
-
-```sh
-cd backend
-npm install
-npm run dev
-```
-
-Or for normal start:
-
-```sh
-cd backend
-npm install
-npm start
-```
-
-### Frontend Setup
-
-```sh
-cd client
-npm install
-npm start
-```
-
-## Local Development URLs
-
-### Current Code-Based Defaults
-
-- Frontend dev server: `http://localhost:3000`
-- Backend server in `backend/server.js`: `http://localhost:5010`
-
-### Important Note
-
-The current frontend API config in [client/src/services/api.js](/d:/AARNA-WEBISTE/AARNA-WEBISTE/client/src/services/api.js) points to `http://localhost:5000` in development, while the backend currently listens on port `5010`.
-
-Before local development, either:
-
-1. change the backend port to `5000`, or
-2. change the frontend API base URL and proxy to `5010`
-
-Files involved:
-
-- [backend/server.js](/d:/AARNA-WEBISTE/AARNA-WEBISTE/backend/server.js)
-- [client/package.json](/d:/AARNA-WEBISTE/AARNA-WEBISTE/client/package.json)
-- [client/src/services/api.js](/d:/AARNA-WEBISTE/AARNA-WEBISTE/client/src/services/api.js)
-
-## Production API Behavior
-
-In production, the frontend is configured to call:
-
-- `https://backend.aarna.net.in/api`
-
-This is defined in [client/src/services/api.js](/d:/AARNA-WEBISTE/AARNA-WEBISTE/client/src/services/api.js).
-
-## Environment Variables
-
-The frontend currently uses `.env` support and the documentation should preserve the existing development note:
-
-```env
-DANGEROUSLY_DISABLE_HOST_CHECK=true
-```
-
-Use this only when required for development or proxy/network edge cases.
-
-Do not commit secrets such as API keys, tokens, or private credentials.
-
-## File Upload Behavior
-
-The backend uses Multer for uploads.
-
-- uploaded files are stored in `backend/uploads/`
-- files are exposed through `/uploads/...`
-- upload limit is currently `200 MB`
-
-This project stores uploaded media in the repository-backed backend directory structure, so production deployments should preserve the `uploads/` folder.
-
-### Site Media Upload Fields
-
-The `PUT /api/site-media` endpoint supports these named upload fields:
+The backend also supports named media upload fields for key pages, including:
 
 - `heroVideoLandscape`
 - `heroVideoPortrait`
@@ -360,84 +261,118 @@ The `PUT /api/site-media` endpoint supports these named upload fields:
 - `eventFloatImage`
 - `stayMainImage`
 - `stayFloatImage`
+- `aboutHeroImage`
+- `aboutIntroMainImage`
+- `aboutIntroFloatImage`
+- `aboutPromiseImage`
+- `contactHeroImage`
 
-Text-based media fields are also saved together with those uploads.
+## 13. Environment and Runtime Configuration
 
-## Scripts Reference
+### Local Development
 
-### Root-Level Git Workflow
+Verified current local development configuration:
 
-```sh
-git status
-git add .
-git commit -m "Describe your changes"
-git push
-```
+- frontend development server: `http://localhost:3000`
+- backend server port: `5010`
+- frontend proxy: `http://localhost:5010`
+- frontend development API base: `http://localhost:5010`
 
-### GitHub Push Workflow for This Project
+### Production API Behavior
 
-Use these commands from the project root when you want to push updated work to GitHub:
+The frontend is configured to call the production backend at:
 
-```sh
-git status
-git add .
-git commit -m "Describe your update"
-git push origin main
-```
+- `https://backend.aarna.net.in/api`
 
-If you want to push only a specific file:
+## 14. Deployment Model
 
-```sh
-git add DOCUMENTATION.md
-git commit -m "Update documentation"
-git push origin main
-```
+### Frontend
 
-If you want to push only a specific folder:
+The frontend is built using:
 
 ```sh
-git add client/src/
-git commit -m "Update frontend files"
-git push origin main
+cd client
+npm run build
 ```
 
-### First-Time Remote Setup Reference
+The generated `client/build/` output is intended for deployment to a static hosting or web hosting environment.
 
-If the repository remote ever needs to be added again, use:
+### Backend
+
+The backend requires deployment of:
+
+- `server.js`
+- `package.json`
+- `package-lock.json`
+- `data/`
+- `uploads/`
+
+Backend start commands:
 
 ```sh
-git remote add origin https://github.com/infompro9-maker/aarna.git
-git branch -M main
-git push -u origin main
+cd backend
+npm install
+npm start
 ```
 
-### GitHub Good Practices
+### Production Consideration
 
-- always run `git status` before pushing
-- review changed files before `git add .`
-- do not push `.env` files or secrets
-- use clear commit messages
-- push to `main` only after checking that the changes are correct
+Because uploads are stored in `backend/uploads/`, production deployment must preserve that directory and its contents across releases.
 
-### Backend Scripts
+## 15. Security and Governance Notes
 
-From `backend/package.json`:
+The current implementation is functionally effective, but the following security and governance observations are important:
 
-- `npm start` - run backend with Node
-- `npm run dev` - run backend with Nodemon
+- the admin route is exposed from frontend routing without a clear authentication layer
+- backend data is stored in editable JSON files rather than a secured database-backed admin system
+- uploads are file-based and therefore require operational controls on hosting infrastructure
+- no explicit role-based access control is currently documented
 
-### Frontend Scripts
+These points should be treated as project limitations and potential next-phase improvements rather than defects in the current scope.
 
-From `client/package.json`:
+## 16. Limitations and Current Risks
 
-- `npm start` - start React development server
-- `npm run build` - create production build
-- `npm test` - run frontend tests
-- `npm run eject` - eject React configuration
+### 16.1 Admin Access Control
 
-## Testing
+The current frontend route configuration renders the admin panel directly through `/admin`. If controlled access is required, authentication and authorization should be added.
 
-Frontend testing is configured with React Testing Library.
+### 16.2 File-Based Data Persistence
+
+The system currently uses JSON files instead of a database. This is suitable for lightweight administration, but it may become difficult to manage under heavier concurrent usage.
+
+### 16.3 Media Persistence
+
+Uploaded files depend on server-side file retention. Environments with ephemeral storage or container rebuilds require careful upload persistence planning.
+
+### 16.4 Route Scope
+
+Some codebase pages exist but are not currently wired into the active route list. For example, `Gallery.js` and `DynamicPage.js` exist in the repository, but are not currently active public routes in [App.js](D:\AARNA-WEBISTE\AARNA-WEBISTE\client\src\App.js:1).
+
+### 16.5 Duplicate/Legacy Structure
+
+The repository includes a `client/backend/` directory in addition to the active root-level `backend/`. This may create confusion for maintenance and should be reviewed in future cleanup work.
+
+## 17. Quality and Maintainability Observations
+
+The project demonstrates several strong maintainability qualities:
+
+- modular page and component structure
+- clear frontend/backend separation
+- reusable hooks for settings and data retrieval
+- centralized API service layer
+- admin-driven content operations
+
+At the same time, the following improvements would strengthen enterprise readiness:
+
+- add authentication for admin access
+- align backend and frontend settings schema
+- replace JSON storage with a database-backed content model
+- formalize environment variable handling
+- add clearer production operational documentation
+
+## 18. Testing and Verification
+
+Frontend testing support is configured with React Testing Library.
 
 Run tests with:
 
@@ -446,104 +381,47 @@ cd client
 npm test
 ```
 
-## Deployment Notes
-
-### Frontend Deployment
-
-Build the frontend first:
+Production builds can be created with:
 
 ```sh
 cd client
 npm run build
 ```
 
-Upload the generated `client/build/` output to your web host or static hosting target.
+## 19. Recommendations for Next Phase
 
-### Backend Deployment
+Recommended enhancements for a future project phase:
 
-Upload the full `backend/` folder, including:
+- implement admin authentication and session protection
+- migrate JSON content storage to a database
+- formalize upload/media management for production durability
+- expand public route coverage if Gallery or Dynamic Page features are intended to be live
+- add structured error logging and operational monitoring
+- prepare a root `README.md` for quick-start onboarding
 
-- `server.js`
-- `package.json`
-- `package-lock.json`
-- `data/`
-- `uploads/`
+## 20. Conclusion
 
-Then install dependencies on the server:
+The AARNA Website project delivers a working full-stack brand website with administrative content management, enquiry handling, analytics support, and a visually rich public-facing experience aligned to a premium wedding destination brand.
 
-```sh
-cd backend
-npm install
-npm start
-```
+From a delivery perspective, the project successfully meets the core objectives of:
 
-### Do Not Upload
+- digital brand presentation
+- enquiry capture
+- internal update flexibility
+- maintainable content operations
 
-- `node_modules/`
-- local editor files
-- temporary caches
-- private `.env` secrets
+While there are areas for improvement in authentication, persistence strategy, and operational hardening, the current implementation provides a strong functional foundation for business use and future expansion.
 
-## Troubleshooting
+## 21. Project Ownership
 
-### If the Frontend Loads but API Data Does Not
-
-Check:
-
-- backend server is running
-- frontend API base URL matches the backend port
-- CORS is enabled on the backend
-- `client/src/services/api.js` points to the intended environment
-
-### If Uploaded Images or Videos Do Not Appear
-
-Check:
-
-- files exist in `backend/uploads/`
-- backend static file serving for `/uploads` is working
-- returned media paths begin with `/uploads/`
-- production server keeps the `uploads/` directory between deployments
-
-### If the Admin Panel Opens but Data Is Empty
-
-Check:
-
-- JSON files exist under `backend/data/`
-- JSON files are valid and not malformed
-- frontend can reach `/api/settings`, `/api/sections`, `/api/services`, `/api/gallery`, and `/api/analytics`
-
-## Known Project Notes
-
-### 1. Hash Routing Is In Use
-
-The app uses `HashRouter`, so links and deployment behavior should account for `#/` paths rather than assuming clean server-side route handling.
-
-### 2. Root `backend/` Is the Active Backend
-
-This repository also contains a `client/backend/` folder, but the actively used backend for this repository is the root-level `backend/` folder.
-
-If `client/backend/` is being kept for reference, archive, or backup purposes, document that clearly in future cleanup work. If not needed, it can be removed later to reduce confusion.
-
-### 3. No Clear Admin Authentication Layer Is Present in Current Frontend Routing
-
-The admin panel route exists and is rendered directly from the frontend route config. If authentication or access control is required, it should be documented and enforced explicitly.
-
-### 4. Current Documentation Scope
-
-This documentation describes the actively wired application behavior found in the current repository. If new pages, routes, authentication, or deployment tooling are added later, this file should be updated together with those changes.
-
-## Recommended Additional Repository Files
-
-- `README.md` at project root for quick-start info
-- `LICENSE` if the project is to be shared publicly
-- `CONTRIBUTING.md` if multiple developers will work on the repo
-
-## Contact and Maintenance
-
+- Project: AARNA Website
+- Repository: `https://github.com/infompro9-maker/aarna`
+- Primary branch: `main`
 - Author: Sahana B D
 - Role: Backend Developer
 - Support email: `sahanabd@mpro9.in`
 
-## Last Updated
+## 22. Document Control
 
-- Documentation updated on May 21, 2026
+- Document type: Corporate Project Documentation
+- Last updated: May 22, 2026

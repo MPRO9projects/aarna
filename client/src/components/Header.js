@@ -8,14 +8,26 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
   const location = useLocation();
 
   useEffect(() => {
+    let rafId = null;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 24);
+      if (rafId !== null) return;
+
+      rafId = window.requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 24);
+        rafId = null;
+      });
     };
 
     window.addEventListener("scroll", handleScroll);
     handleScroll();
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -49,6 +61,10 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
               ref={ref}
               src="/logo.png"
               alt="Aarna Resort"
+              width="180"
+              height="72"
+              decoding="async"
+              fetchPriority="high"
               className={`logo-image ${
                 showRealLogo ? "visible" : "hidden-for-transition"
               }`}
@@ -59,13 +75,13 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
           <nav className="desktop-nav" aria-label="Main navigation">
             <ul className="nav-list">
               <li className={location.pathname === "/" ? "active" : ""}>
-                <Link to="/">Home</Link>
+                <Link to="/" aria-current={location.pathname === "/" ? "page" : undefined}>Home</Link>
               </li>
               <li className={location.pathname === "/about" ? "active" : ""}>
-                <Link to="/about">About Us</Link>
+                <Link to="/about" aria-current={location.pathname === "/about" ? "page" : undefined}>About Us</Link>
               </li>
               <li className={location.pathname === "/contact" ? "active" : ""}>
-                <Link to="/contact">Contact</Link>
+                <Link to="/contact" aria-current={location.pathname === "/contact" ? "page" : undefined}>Contact</Link>
               </li>
             </ul>
           </nav>
@@ -112,6 +128,7 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
             to="/"
             className={location.pathname === "/" ? "active" : ""}
             onClick={() => setMobileMenuOpen(false)}
+            aria-current={location.pathname === "/" ? "page" : undefined}
           >
             Home
           </Link>
@@ -119,6 +136,7 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
             to="/about"
             className={location.pathname === "/about" ? "active" : ""}
             onClick={() => setMobileMenuOpen(false)}
+            aria-current={location.pathname === "/about" ? "page" : undefined}
           >
             About Us
           </Link>
@@ -126,6 +144,7 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
             to="/contact"
             className={location.pathname === "/contact" ? "active" : ""}
             onClick={() => setMobileMenuOpen(false)}
+            aria-current={location.pathname === "/contact" ? "page" : undefined}
           >
             Contact
           </Link>

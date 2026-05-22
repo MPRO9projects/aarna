@@ -2,15 +2,22 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import '../styles/PrivacyTerms.css';
+import { usePageSeo } from '../hooks/usePageSeo';
 
 const TermsOfService = () => {
+  usePageSeo({
+    title: 'Terms of Service',
+    description:
+      'Read the Aarna terms of service covering bookings, payments, event rules, cancellations, guest responsibilities, and venue policies.',
+    routePath: '/terms-of-service',
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = 'Terms of Service | Aarna Destination Venue';
   }, []);
 
   return (
-    <div className="privacy-terms-page">
+    <main id="main-content" className="privacy-terms-page">
       {/* Hero Section */}
       <section className="pt-hero-section">
         <div className="pt-hero-overlay" />
@@ -170,7 +177,7 @@ const TermsOfService = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

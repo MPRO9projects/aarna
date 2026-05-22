@@ -1,11 +1,28 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock3,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Plane,
+  LoaderCircle,
+} from 'lucide-react';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import '../styles/Contact.css';
 import { useSettings } from '../hooks/useSettings';
-import { submitContact } from '../services/api';
+import { fetchSiteMedia, resolveMediaUrl, submitContact } from '../services/api';
+import { usePageSeo } from '../hooks/usePageSeo';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
+
+const mediaUrl = (val, fallback) => {
+  const resolved = resolveMediaUrl(val);
+  return resolved || fallback;
+};
 
 /* ── Custom Hook for Scroll Reveal with Bidirectional Animation ── */
 function useScrollReveal() {
@@ -28,20 +45,18 @@ function useScrollReveal() {
 
     els.forEach((el) => observer.observe(el));
 
-    document.title = 'Contact Aarna | Wedding Destination';
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute(
-        "content",
-        "Get in touch with Aarna to plan your dream wedding. Let's create something beautiful together."
-      );
-    }
-
     return () => observer.disconnect();
   }, []);
 }
 
 function Contact() {
+  usePageSeo({
+    title: 'Contact Aarna',
+    description:
+      'Get in touch with Aarna for weddings, receptions, stays, and event planning near Mysore. Enquire about availability, bookings, and venue details.',
+    routePath: '/contact',
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -60,9 +75,14 @@ function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [siteMedia, setSiteMedia] = useState({});
 
   // Get dynamic settings
   const { settings, loading: settingsLoading } = useSettings();
+
+  useEffect(() => {
+    fetchSiteMedia().then(setSiteMedia).catch(() => {});
+  }, []);
 
   // Refs for sections
   const contactContentRef = useRef(null);
@@ -233,11 +253,11 @@ function Contact() {
   }, []);
 
   return (
-    <div className="contact-page">
+    <main id="main-content" className="contact-page">
       {/* Hero Section */}
       <motion.section
         className="contact-hero"
-        style={{ backgroundImage: "url('/contact.png')" }}
+        style={{ backgroundImage: `url('${mediaUrl(siteMedia.contactHeroImage, '/contact.png')}')` }}
         initial={{ opacity: 0, scale: 1.05 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT }}
@@ -255,7 +275,7 @@ function Contact() {
       {/* Contact Information & Form */}
       <motion.section
         ref={contactContentRef}
-        className="contact-content-section"
+        className="contact-content-section deferred-section"
         variants={fadeUpVariants}
         initial="hidden"
         animate={contactContentControls}
@@ -289,7 +309,7 @@ function Contact() {
                 >
                   <motion.div className="info-item" variants={staggerItem}>
                     <div className="info-icon">
-                      <i className="fa-solid fa-location-dot"></i>
+                      <MapPin size={20} strokeWidth={2.1} aria-hidden="true" />
                     </div>
                     <div className="info-text">
                       <h3>Our Location</h3>
@@ -299,7 +319,7 @@ function Contact() {
 
                   <motion.div className="info-item" variants={staggerItem}>
                     <div className="info-icon">
-                      <i className="fa-solid fa-phone"></i>
+                      <Phone size={20} strokeWidth={2.1} aria-hidden="true" />
                     </div>
                     <div className="info-text">
                       <h3>Call Us</h3>
@@ -312,7 +332,7 @@ function Contact() {
 
                   <motion.div className="info-item" variants={staggerItem}>
                     <div className="info-icon">
-                      <i className="fa-solid fa-envelope"></i>
+                      <Mail size={20} strokeWidth={2.1} aria-hidden="true" />
                     </div>
                     <div className="info-text">
                       <h3>Email Us</h3>
@@ -326,7 +346,7 @@ function Contact() {
 
                   <motion.div className="info-item" variants={staggerItem}>
                     <div className="info-icon">
-                      <i className="fa-solid fa-clock"></i>
+                      <Clock3 size={20} strokeWidth={2.1} aria-hidden="true" />
                     </div>
                     <div className="info-text">
                       <h3>Opening Hours</h3>
@@ -349,7 +369,7 @@ function Contact() {
                       rel="noreferrer"
                       aria-label="Instagram"
                     >
-                      <i className="fa-brands fa-instagram"></i>
+                      <i className="fa-brands fa-instagram" style={{fontSize:18}} aria-hidden="true"></i>
                     </a>
                     <a
                       href={settings?.social?.facebook || 'https://facebook.com'}
@@ -357,7 +377,7 @@ function Contact() {
                       rel="noreferrer"
                       aria-label="Facebook"
                     >
-                      <i className="fa-brands fa-facebook-f"></i>
+                      <i className="fa-brands fa-facebook-f" style={{fontSize:18}} aria-hidden="true"></i>
                     </a>
                     <a
                       href={settings?.social?.youtube || 'https://youtube.com'}
@@ -365,7 +385,7 @@ function Contact() {
                       rel="noreferrer"
                       aria-label="YouTube"
                     >
-                      <i className="fa-brands fa-youtube"></i>
+                      <i className="fa-brands fa-youtube" style={{fontSize:18}} aria-hidden="true"></i>
                     </a>
                     <a
                       href={settings?.social?.whatsapp || 'https://wa.me/919845122100'}
@@ -373,19 +393,19 @@ function Contact() {
                       rel="noreferrer"
                       aria-label="WhatsApp"
                     >
-                      <i className="fa-brands fa-whatsapp"></i>
+                      <MessageCircle size={18} strokeWidth={2} aria-hidden="true" />
                     </a>
                     <a
                       href={`tel:${settings?.phone?.replace(/\D/g, '') || '9845122100'}`}
                       aria-label="Call Us"
                     >
-                      <i className="fa-solid fa-phone"></i>
+                      <Phone size={18} strokeWidth={2} aria-hidden="true" />
                     </a>
                     <a
                       href={`mailto:${settings?.email || 'aarnadestinations@gmail.com'}`}
                       aria-label="Email Us"
                     >
-                      <i className="fa-solid fa-envelope"></i>
+                      <Mail size={18} strokeWidth={2} aria-hidden="true" />
                     </a>
                   </div>
                 </motion.div>
@@ -408,7 +428,7 @@ function Contact() {
                     transition={{ duration: 0.5, ease: EASE_OUT }}
                   >
                     <div className="success-icon">
-                      <i className="fa-solid fa-circle-check"></i>
+                      <CheckCircle2 size={72} strokeWidth={1.8} aria-hidden="true" />
                     </div>
                     <h3>Thank You!</h3>
                     <p>
@@ -444,7 +464,7 @@ function Contact() {
 
                     {submitError && (
                       <div className="error-message" style={{ color: '#dc3545', marginBottom: '20px', padding: '10px', background: '#ffe6e6', borderRadius: '8px' }}>
-                        <i className="fa-solid fa-exclamation-triangle"></i> {submitError}
+                        <AlertTriangle size={16} strokeWidth={2.2} aria-hidden="true" style={{ verticalAlign: 'text-bottom' }} /> {submitError}
                       </div>
                     )}
 
@@ -643,11 +663,11 @@ function Contact() {
                         variants={staggerItem}
                       >
                         {isSubmitting ? (
-                          <><i className="fa-solid fa-spinner fa-spin"></i> Sending...</>
+                          <><LoaderCircle size={16} strokeWidth={2.2} aria-hidden="true" className="spin-icon" /> Sending...</>
                         ) : (
                           <>{formData.eventType === 'book-your-stay'
                             ? 'Send Stay Enquiry'
-                            : 'Send Wedding Enquiry'} <i className="fa-solid fa-paper-plane"></i></>
+                            : 'Send Wedding Enquiry'} <Plane size={16} strokeWidth={2.2} aria-hidden="true" /></>
                         )}
                       </motion.button>
                     </motion.form>
@@ -662,7 +682,7 @@ function Contact() {
       {/* Map Section with Zoom In Animation */}
       <motion.section
         ref={mapRef}
-        className="map-section"
+        className="map-section deferred-section"
         variants={zoomInVariants}
         initial="hidden"
         animate={mapControls}
@@ -685,7 +705,7 @@ function Contact() {
       {/* CTA Section with Fade Up Animation */}
       <motion.section
         ref={ctaRef}
-        className="wedding-cta"
+        className="wedding-cta deferred-section"
         variants={fadeUpVariants}
         initial="hidden"
         animate={ctaControls}
@@ -703,7 +723,7 @@ function Contact() {
           </div>
         </div>
       </motion.section>
-    </div>
+    </main>
   );
 }
 

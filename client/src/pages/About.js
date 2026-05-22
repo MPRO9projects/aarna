@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import '../styles/About.css';
 import { useServices } from '../hooks/useService';
 import { useSettings } from '../hooks/useSettings';
+import { usePageSeo } from '../hooks/usePageSeo';
+import { fetchSiteMedia, resolveMediaUrl } from '../services/api';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
 
@@ -13,6 +15,11 @@ const TURN_DURATION_MS = 1600;       // 1.6 seconds for page turns
 const PAGE_PAUSE_MS = 1800;          // 1.8 seconds pause between pages
 const END_PAUSE_MS = 2500;           // 2.5 seconds at end
 const START_DELAY_MS = 800;          // 800ms delay before book starts
+
+const mediaUrl = (val, fallback) => {
+  const resolved = resolveMediaUrl(val);
+  return resolved || fallback;
+};
 
 function useScrollReveal() {
   useEffect(() => {
@@ -34,16 +41,6 @@ function useScrollReveal() {
     );
 
     els.forEach((el) => observer.observe(el));
-
-    document.title = 'About Aarna | Wedding Destination';
-
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute(
-        'content',
-        'Discover the story behind Aarna – a premium wedding destination where love meets elegance.'
-      );
-    }
 
     return () => observer.disconnect();
   }, []);
@@ -153,20 +150,70 @@ function RisingTypingText({ text, className = '', isActive = false }) {
 
 export default function About() {
   useScrollReveal();
+  usePageSeo({
+    title: 'About Aarna',
+    description:
+      'Discover Aarna, a luxury wedding destination near Mysore offering elegant venues, curated services, and memorable celebrations.',
+    routePath: '/about',
+  });
 
   const introRef = useRef(null);
   const whyChooseRef = useRef(null);
   const servicesBookRef = useRef(null);
+  const visionMissionRef = useRef(null);
   const promiseRef = useRef(null);
   const [activeReadableService, setActiveReadableService] = useState(0);
   const [serviceSlideIndex, setServiceSlideIndex] = useState(0);
   const serviceAutoRef = useRef(null);
+  const [useCompactBookExperience, setUseCompactBookExperience] = useState(false);
+  const [siteMedia, setSiteMedia] = useState({});
 
   // Get dynamic settings and services
   const { settings, loading: settingsLoading } = useSettings();
   const { services: adminServices, loading: servicesLoading } = useServices();
 
-  const heroImage = settings?.heroImage || '/about-hero.jpg';
+  useEffect(() => {
+    fetchSiteMedia().then(setSiteMedia).catch(() => {});
+  }, []);
+
+  const heroImage = mediaUrl(
+    siteMedia.aboutHeroImage,
+    settings?.heroImage || '/about-hero.jpg'
+  );
+  const aboutIntroMainImage = mediaUrl(
+    siteMedia.aboutIntroMainImage,
+    settings?.aboutImage || '/first.png'
+  );
+  const aboutIntroFloatImage = mediaUrl(
+    siteMedia.aboutIntroFloatImage,
+    '/second.png'
+  );
+  const aboutPromiseImage = mediaUrl(
+    siteMedia.aboutPromiseImage,
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82'
+  );
+
+  const visionPoints = useMemo(
+    () => [
+      'Become a premier wedding destination',
+      'Transform every celebration into a timeless, unforgettable experience',
+      'Blend elegance, tradition, and modern luxury seamlessly',
+      'Create moments that leave lasting impressions',
+      'Set new standards in wedding celebrations',
+    ],
+    []
+  );
+
+  const missionPoints = useMemo(
+    () => [
+      'Create magical and personalized wedding experiences',
+      'Offer exceptional venues and curated services',
+      'Deliver impeccable hospitality',
+      'Ensure attention to detail and aesthetic excellence',
+      'Turn every dream celebration into reality with heartfelt service',
+    ],
+    []
+  );
 
 
   const introTitleWords = 'The Perfect Wedding Destination'.split(' ');
@@ -298,6 +345,11 @@ export default function About() {
   const introInView = useInView(introRef, {
     once: false,
     amount: 0.35,
+  });
+
+  const visionMissionInView = useInView(visionMissionRef, {
+    once: false,
+    amount: 0.22,
   });
 
   const promiseInView = useInView(promiseRef, {
@@ -450,6 +502,24 @@ export default function About() {
   const observerRef = useRef(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined;
+
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const syncBookExperience = () => {
+      setUseCompactBookExperience(reducedMotionQuery.matches);
+    };
+
+    syncBookExperience();
+
+    reducedMotionQuery.addEventListener('change', syncBookExperience);
+
+    return () => {
+      reducedMotionQuery.removeEventListener('change', syncBookExperience);
+    };
+  }, []);
+
+  useEffect(() => {
     setServiceBookRotations(serviceBookPages.map(() => 0));
     setActiveBookStep(0);
     activeBookStepRef.current = 0;
@@ -487,6 +557,16 @@ export default function About() {
     serviceBookTimeoutsRef.current = [];
   };
 
+  const applyBookStepInstant = (targetIndex) => {
+    const clampedTarget = Math.max(0, Math.min(targetIndex, serviceBookPages.length - 1));
+    setServiceBookRotations(
+      serviceBookPages.map((_, index) => (index < clampedTarget ? -180 : 0))
+    );
+    setActiveBookStep(clampedTarget);
+    activeBookStepRef.current = clampedTarget;
+    updateBookVisualOffset(clampedTarget);
+  };
+
   const waitForBook = (ms) =>
     new Promise((resolve) => {
       const id = window.setTimeout(resolve, ms);
@@ -496,10 +576,7 @@ export default function About() {
   const resetBook = () => {
     clearServiceBookTimeouts();
     serviceBookAbortRef.current = false;
-    setServiceBookRotations(serviceBookPages.map(() => 0));
-    setActiveBookStep(0);
-    activeBookStepRef.current = 0;
-    setBookVisualOffset(0);
+    applyBookStepInstant(0);
     setIsBookAnimating(false);
     isAnimatingRef.current = false;
     sequenceCompletedRef.current = false;
@@ -603,6 +680,12 @@ export default function About() {
       return;
     }
 
+    if (useCompactBookExperience) {
+      resetBook();
+      setShouldResetBook(false);
+      return undefined;
+    }
+
     let mounted = true;
 
     const startSequence = async () => {
@@ -621,7 +704,7 @@ export default function About() {
       serviceBookAbortRef.current = true;
       clearServiceBookTimeouts();
     };
-  }, [servicesBookInView, bookLoopKey]);
+  }, [servicesBookInView, bookLoopKey, useCompactBookExperience]);
 
   useEffect(() => {
     return () => {
@@ -631,6 +714,15 @@ export default function About() {
   }, []);
 
   const stopAutoAndRun = async (targetIndex) => {
+    if (useCompactBookExperience) {
+      serviceBookAbortRef.current = true;
+      clearServiceBookTimeouts();
+      setIsBookAnimating(false);
+      isAnimatingRef.current = false;
+      applyBookStepInstant(targetIndex);
+      return;
+    }
+
     serviceBookAbortRef.current = true;
     clearServiceBookTimeouts();
 
@@ -686,7 +778,13 @@ export default function About() {
 
     return (
       <div className="book-page-image">
-        <img src={page.image || heroImage} alt={page.alt || page.title} />
+        <img
+          src={page.image || heroImage}
+          alt={page.alt || page.title}
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+        />
       </div>
     );
   };
@@ -694,7 +792,10 @@ export default function About() {
   const renderBookPageBack = (page, index) => {
     const headingId = `${page.id}-heading`;
     const isBackFaceActive = index === Math.max(activeBookStep - 1, 0);
-    const shouldTypeHeading = isBackFaceActive && !typedBookHeadingsRef.current.has(headingId);
+    const shouldTypeHeading =
+      !useCompactBookExperience &&
+      isBackFaceActive &&
+      !typedBookHeadingsRef.current.has(headingId);
     const markTypedHeading = () => typedBookHeadingsRef.current.add(headingId);
 
     if (page.kind === 'cover') {
@@ -839,7 +940,7 @@ export default function About() {
   };
 
   return (
-    <div className="about-page">
+    <main id="main-content" className="about-page">
       <section className="about-hero about-hero-slider">
         <div
           className="about-hero-slide about-hero-static-image"
@@ -857,7 +958,7 @@ export default function About() {
         </div>
       </section>
 
-      <section ref={introRef} className="intro-section intro-section-cinematic">
+      <section ref={introRef} className="intro-section intro-section-cinematic deferred-section">
         <div className="container">
           <div className="about-grid about-grid-cinematic">
             <motion.div
@@ -923,9 +1024,13 @@ export default function About() {
                 />
 
                 <motion.img
-                  src={settings?.aboutImage || '/first.png'}
+                  src={aboutIntroMainImage}
                   alt="Aarna Wedding Venue"
                   className="img-main-cinematic"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                  sizes="(max-width: 767px) 92vw, (max-width: 1199px) 64vw, 42vw"
                   initial={{ scale: 1.14 }}
                   animate={
                     introInView
@@ -951,9 +1056,13 @@ export default function About() {
                 animate={introSecondaryImageControls}
               >
                 <motion.img
-                  src="/second.png"
+                  src={aboutIntroFloatImage}
                   alt="Wedding décor"
                   className="img-secondary-cinematic"
+                  loading="lazy"
+                  decoding="async"
+                  fetchPriority="low"
+                  sizes="(max-width: 767px) 58vw, (max-width: 1199px) 36vw, 22vw"
                   initial={{ scale: 1.08 }}
                   animate={
                     introInView
@@ -985,7 +1094,7 @@ export default function About() {
         </div>
       </section>
 
-      <section ref={whyChooseRef} className="why-choose-about-section">
+      <section ref={whyChooseRef} className="why-choose-about-section deferred-section">
         <div className="container">
           <div className="section-head-center" data-reveal>
             <span className="kicker">
@@ -1063,7 +1172,7 @@ export default function About() {
               <div className="reference-book-shadow" />
 
               <div
-                className={`reference-book ${isBookAnimating ? 'is-animating' : ''} ${activeBookStep === 0 || activeBookStep >= serviceBookPages.length ? 'is-closed' : ''
+                className={`reference-book ${isBookAnimating ? 'is-animating' : ''} ${useCompactBookExperience ? 'is-compact' : ''} ${activeBookStep === 0 || activeBookStep >= serviceBookPages.length ? 'is-closed' : ''
                   }`}
                 style={{
                   transform: `translateX(${bookVisualOffset}%) scale(${activeBookStep === 0 || activeBookStep >= serviceBookPages.length ? 1.04 : 1})`,
@@ -1189,7 +1298,137 @@ export default function About() {
         </div>
       </section>
 
-      <section ref={promiseRef} className="promise-ref-section">
+      <section ref={visionMissionRef} className="about-vision-mission-section">
+        <div className="about-vision-mission-orb about-vision-mission-orb-one" />
+        <div className="about-vision-mission-orb about-vision-mission-orb-two" />
+
+        <div className="container">
+          <motion.div
+            className="about-vision-mission-shell"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={visionMissionInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.95, ease: EASE_OUT }}
+          >
+            <motion.div
+              className="about-vision-mission-head"
+              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              animate={visionMissionInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 28, scale: 0.98 }}
+              transition={{ duration: 0.78, ease: EASE_OUT }}
+            >
+              <TypingHeading
+                text="THE HEART OF AARNA"
+                triggerKey={`vision-mission-kicker-${visionMissionInView ? 'in' : 'out'}`}
+                className="kicker about-vision-mission-kicker"
+                speed={42}
+                as="span"
+              />
+              <h2 className="about-vision-mission-title">
+                <RisingTypingText
+                  text="A timeless vision, guided by heartfelt purpose"
+                  isActive={visionMissionInView}
+                />
+              </h2>
+              <motion.div
+                className="gold-rule about-vision-mission-rule"
+                initial={{ width: 0, opacity: 0 }}
+                animate={visionMissionInView ? { width: 74, opacity: 1 } : { width: 0, opacity: 0 }}
+                transition={{ duration: 0.7, delay: 0.18, ease: EASE_OUT }}
+              />
+              <motion.p
+                className="about-vision-mission-intro"
+                initial={{ opacity: 0, y: 16 }}
+                animate={visionMissionInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+                transition={{ duration: 0.72, delay: 0.22, ease: EASE_OUT }}
+              >
+                At <span className="aarna-brand">aarna</span>, every celebration is shaped by a
+                refined vision and a heartfelt mission to create wedding experiences that feel elegant,
+                personal, and truly unforgettable.
+              </motion.p>
+              <TypingHeading
+                text="Where elegance meets intention."
+                triggerKey={`vision-mission-tagline-${visionMissionInView ? 'in' : 'out'}`}
+                className="about-vision-mission-tagline"
+                speed={34}
+                as="p"
+              />
+            </motion.div>
+
+            <div className={`about-vision-mission-bookstage ${visionMissionInView ? 'is-looping' : ''}`}>
+              <div className="about-vision-mission-cover about-vision-mission-cover-left">
+                <div className="about-vision-mission-cover-inner">
+                  <span className="about-vision-mission-cover-kicker">Vision</span>
+                  <span className="about-vision-mission-cover-brand">aarna</span>
+                  <span className="about-vision-mission-cover-copy">A destination for timeless wedding celebrations</span>
+                </div>
+              </div>
+
+              <div className="about-vision-mission-cover about-vision-mission-cover-right">
+                <div className="about-vision-mission-cover-inner">
+                  <span className="about-vision-mission-cover-kicker">Mission</span>
+                  <span className="about-vision-mission-cover-brand">aarna</span>
+                  <span className="about-vision-mission-cover-copy">Every dream celebration, crafted with care</span>
+                </div>
+              </div>
+
+              <div className="about-vision-mission-seal" />
+
+              <div className="about-vision-mission-spine" />
+
+              <div className="about-vision-mission-grid">
+              <article className="about-vision-card">
+                <div className="about-vision-card-glow" />
+                <TypingHeading
+                  text="Vision of"
+                  triggerKey={`vision-card-label-${visionMissionInView ? 'in' : 'out'}`}
+                  className="about-vision-card-eyebrow"
+                  speed={32}
+                  as="span"
+                />
+                <span className="about-vision-card-label"><span className="aarna-brand">aarna</span></span>
+                <ul className="about-vision-card-list">
+                  {visionPoints.map((point, index) => (
+                    <motion.li
+                      key={point}
+                      initial={{ opacity: 0, y: index % 2 === 0 ? 22 : -22 }}
+                      animate={visionMissionInView ? { opacity: 1, y: 0 } : { opacity: 0, y: index % 2 === 0 ? 22 : -22 }}
+                      transition={{ duration: 0.58, delay: 0.22 + index * 0.08, ease: EASE_OUT }}
+                    >
+                      {point}
+                    </motion.li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className="about-vision-card about-mission-card">
+                <div className="about-vision-card-glow" />
+                <TypingHeading
+                  text="Mission of"
+                  triggerKey={`mission-card-label-${visionMissionInView ? 'in' : 'out'}`}
+                  className="about-vision-card-eyebrow"
+                  speed={32}
+                  as="span"
+                />
+                <span className="about-vision-card-label"><span className="aarna-brand">aarna</span></span>
+                <ul className="about-vision-card-list">
+                  {missionPoints.map((point, index) => (
+                    <motion.li
+                      key={point}
+                      initial={{ opacity: 0, y: index % 2 === 0 ? -22 : 22 }}
+                      animate={visionMissionInView ? { opacity: 1, y: 0 } : { opacity: 0, y: index % 2 === 0 ? -22 : 22 }}
+                      transition={{ duration: 0.58, delay: 0.28 + index * 0.08, ease: EASE_OUT }}
+                    >
+                      {point}
+                    </motion.li>
+                  ))}
+                </ul>
+              </article>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section ref={promiseRef} className="promise-ref-section deferred-section">
         <div className="container">
           <motion.div
             className="promise-ref-grid"
@@ -1204,10 +1443,13 @@ export default function About() {
               transition={{ duration: 0.85, ease: EASE_OUT }}
             >
               <motion.img
-                src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82"
+                src={aboutPromiseImage}
                 alt="Bride holding bouquet"
                 className="promise-ref-image"
                 loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+                sizes="(max-width: 991px) 100vw, 50vw"
                 initial={{ scale: 1.08 }}
                 animate={promiseInView ? { scale: 1 } : { scale: 1.08 }}
                 transition={{ duration: 1.25, ease: EASE_OUT }}
@@ -1267,6 +1509,6 @@ export default function About() {
           </motion.div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

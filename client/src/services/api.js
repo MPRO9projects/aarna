@@ -4,9 +4,7 @@
 
 // Auto-detect environment
 const isDevelopment = process.env.NODE_ENV === 'development';
-const ORIGIN =
-  typeof window !== 'undefined' ? window.location.origin : '';
-const SERVER_BASE_URL = isDevelopment ? 'http://localhost:5000' : 'https://backend.aarna.net.in';
+const SERVER_BASE_URL = isDevelopment ? 'http://localhost:5010' : 'https://backend.aarna.net.in';
 
 
 // API URL - works everywhere!

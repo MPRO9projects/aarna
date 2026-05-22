@@ -224,6 +224,12 @@
   transition: all 0.35s ease;
 }
 
+.info-icon svg,
+.social-icons a svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
 .info-item:hover .info-icon {
   background: var(--maroon-soft);
   color: #ffffff;
@@ -423,8 +429,11 @@
   box-shadow: 0 12px 24px rgba(212, 175, 55, 0.26);
 }
 
-.btn-maroon i {
+.btn-maroon i,
+.btn-maroon svg {
   font-size: 0.95rem;
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .success-message .btn-maroon {
@@ -441,6 +450,24 @@
   font-size: 4.5rem;
   color: var(--maroon-soft);
   margin-bottom: 24px;
+}
+
+.success-icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+.spin-icon {
+  animation: spinIcon 1s linear infinite;
+}
+
+@keyframes spinIcon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .success-message h3 {
@@ -1023,13 +1050,28 @@ html {
 }
 
 /* Content text alignment consistency */
-.details-intro,
 .info-text p,
-.form-intro,
-.success-message p,
-.cta-simple p {
+.success-message p {
   text-align: justify;
   text-justify: inter-word;
+}
+
+.form-intro {
+  text-align: left;
+  text-justify: auto;
+  color: #4a3a37;
+}
+
+.details-intro {
+  text-align: left;
+  text-justify: auto;
+  color: #4a3a37;
+}
+
+.cta-simple p {
+  text-align: center;
+  text-justify: auto;
+  color: #4a3a37;
 }
 
 /* ── Book Your Stay conditional fields ─────────── */

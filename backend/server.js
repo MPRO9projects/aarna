@@ -241,6 +241,11 @@ app.put('/api/site-media', upload.fields([
   { name: 'eventFloatImage', maxCount: 1 },
   { name: 'stayMainImage', maxCount: 1 },
   { name: 'stayFloatImage', maxCount: 1 },
+  { name: 'aboutHeroImage', maxCount: 1 },
+  { name: 'aboutIntroMainImage', maxCount: 1 },
+  { name: 'aboutIntroFloatImage', maxCount: 1 },
+  { name: 'aboutPromiseImage', maxCount: 1 },
+  { name: 'contactHeroImage', maxCount: 1 },
 ]), (req, res) => {
   const media = readData('siteMedia.json');
   const updated = { ...media, ...req.body };

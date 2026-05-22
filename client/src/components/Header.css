@@ -235,20 +235,18 @@
   box-shadow: 0 10px 24px rgba(111, 31, 59, 0.22);
 }
 
-/* Book Your Stay Button - Gold Outline Style */
+/* Book Your Stay Button - Filled Style for Better Contrast */
 .btn-book-stay {
-  background: transparent;
-  color: #6f1f3b;
-  border: 1.5px solid #6f1f3b;
-  box-shadow: 0 4px 12px rgba(111, 31, 59, 0.08);
+  background: linear-gradient(135deg, #6f1f3b, #532033);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(111, 31, 59, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-book-stay:hover {
   transform: translateY(-1px);
-  background: rgba(111, 31, 59, 0.08);
-  border-color: #4e1026;
-  color: #4e1026;
-  box-shadow: 0 6px 16px rgba(111, 31, 59, 0.16);
+  background: linear-gradient(135deg, #5d1832, #431524);
+  box-shadow: 0 10px 24px rgba(111, 31, 59, 0.22);
 }
 
 /* Scrolled state adjustments */
@@ -258,8 +256,9 @@
 }
 
 .site-header.scrolled .btn-book-stay {
-  border-color: #5d1832;
-  color: #5d1832;
+  background: linear-gradient(135deg, #5d1832, #431524);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(111, 31, 59, 0.12);
 }
 
 /* =========================

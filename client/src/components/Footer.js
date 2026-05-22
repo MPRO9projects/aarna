@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Mail, MapPin, Phone } from "lucide-react";
 import "./Footer.css";
 
 function Footer() {
@@ -31,7 +32,7 @@ function Footer() {
                 rel="noreferrer"
                 aria-label="Facebook"
               >
-                <i className="fa-brands fa-facebook"></i>
+                <i className="fa-brands fa-facebook-f" style={{fontSize:18}} aria-hidden="true"></i>
               </a>
               <a
                 href="https://instagram.com"
@@ -39,7 +40,7 @@ function Footer() {
                 rel="noreferrer"
                 aria-label="Instagram"
               >
-                <i className="fa-brands fa-instagram"></i>
+                <i className="fa-brands fa-instagram" style={{fontSize:18}} aria-hidden="true"></i>
               </a>
               <a
                 href="https://youtube.com"
@@ -47,16 +48,16 @@ function Footer() {
                 rel="noreferrer"
                 aria-label="YouTube"
               >
-                <i className="fa-brands fa-youtube"></i>
+                <i className="fa-brands fa-youtube" style={{fontSize:18}} aria-hidden="true"></i>
               </a>
               <a href="tel:+9845122100" aria-label="Call Us">
-                <i className="fa-solid fa-phone"></i>
+                <Phone size={18} strokeWidth={2} aria-hidden="true" />
               </a>
               <a
                 href="mailto:aarnadestinations@gmail.com"
                 aria-label="Email Us"
               >
-                <i className="fa-solid fa-envelope"></i>
+                <Mail size={18} strokeWidth={2} aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -111,17 +112,17 @@ function Footer() {
 
             <div className="footer-contact-info">
               <div className="contact-item">
-                <i className="fa-solid fa-location-dot"></i>
+                <MapPin size={16} strokeWidth={2} aria-hidden="true" />
                 <span>Gungralchatra, Mysore-571130, Near Bangalore-Kushalnagar NH-275, Mysore, Karnataka, India.</span>
               </div>
 
               <div className="contact-item">
-                <i className="fa-solid fa-phone"></i>
+                <Phone size={16} strokeWidth={2} aria-hidden="true" />
                 <a href="tel:+9845122100">+91 98451 22100</a>
               </div>
 
               <div className="contact-item">
-                <i className="fa-solid fa-envelope"></i>
+                <Mail size={16} strokeWidth={2} aria-hidden="true" />
                 <a href="mailto:aarnadestinations@gmail.com">
                   aarnadestinations@gmail.com
                 </a>

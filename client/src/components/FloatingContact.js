@@ -1,4 +1,5 @@
 import React from 'react';
+import { Mail, MessageCircle, Phone } from 'lucide-react';
 import './FloatingContact.css';
 
 const FloatingContact = () => {
@@ -15,7 +16,7 @@ const FloatingContact = () => {
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
       >
-        <i className="fa-brands fa-whatsapp"></i>
+        <MessageCircle size={20} strokeWidth={2.1} aria-hidden="true" />
         <span className="tooltip">WhatsApp</span>
       </a>
       
@@ -24,7 +25,7 @@ const FloatingContact = () => {
         className="floating-btn email"
         aria-label="Send Email"
       >
-        <i className="fa-solid fa-envelope"></i>
+        <Mail size={20} strokeWidth={2.1} aria-hidden="true" />
         <span className="tooltip">Email</span>
       </a>
 
@@ -33,7 +34,7 @@ const FloatingContact = () => {
         className="floating-btn call"
         aria-label="Call Us"
       >
-        <i className="fa-solid fa-phone"></i>
+        <Phone size={20} strokeWidth={2.1} aria-hidden="true" />
         <span className="tooltip">Call Us</span>
       </a>
     </div>

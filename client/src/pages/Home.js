@@ -10,6 +10,7 @@ import {
   AnimatePresence,
   LayoutGroup,
   motion,
+  useMotionValue,
   useScroll,
   useTransform,
 } from 'framer-motion';
@@ -18,11 +19,13 @@ import landscapeVideo from '../Assets/video/landscape.mp4';
 import portraitVideo from '../Assets/video/portrait.mp4';
 import { useSections } from '../hooks/useSections';
 import { fetchSiteMedia, resolveMediaUrl } from '../services/api';
+import { usePageSeo } from '../hooks/usePageSeo';
 
 /* ─── shared easing ──────────────────────────────────────── */
 const EASE_OUT = [0.22, 1, 0.36, 1];
 const EASE_SMOOTH = [0.25, 0.46, 0.45, 0.94];
 const EASE_GENTLE = [0.33, 0.66, 0.66, 1];
+const INTRO_FAILSAFE_MS = 9000;
 
 /* ═══════════════════════════════════════════════════════════
    AnimatedTitle
@@ -390,6 +393,14 @@ const mediaUrl = (val, fallback) => {
   return resolved || fallback;
 };
 
+const getInitialIntroVideo = () => {
+  if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+    return portraitVideo;
+  }
+
+  return landscapeVideo;
+};
+
 function EventsAndStaySection({ siteMedia = {} }) {
   const eventTypes = [
     'Weddings',
@@ -447,7 +458,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
   };
 
   return (
-    <section className="events-stay-section sample-style-section">
+    <section className="events-stay-section sample-style-section deferred-section">
       <div className="sample-style-top-wave" />
       <div className="sample-style-bottom-wave" />
 
@@ -594,9 +605,12 @@ function EventsAndStaySection({ siteMedia = {} }) {
             >
               <div className="image-curtain-shell sample-image-shell">
                 <img
-                  src="/first.png"
+                  src={mediaUrl(siteMedia.eventMainImage, '/first.png')}
                   alt="Elegant celebration setup"
                   className="sample-main-image"
+                  loading="lazy"
+                  decoding="async"
+                  fetchPriority="low"
                 />
                 <div className="refined-image-overlay" />
                 <motion.div
@@ -617,8 +631,11 @@ function EventsAndStaySection({ siteMedia = {} }) {
               transition={{ duration: 0.8, delay: 0.2, ease: EASE_OUT }}
             >
               <img
-                src="/second.png"
+                src={mediaUrl(siteMedia.eventFloatImage, '/second.png')}
                 alt="Outdoor celebration"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
               />
             </motion.div>
           </div>
@@ -645,6 +662,9 @@ function EventsAndStaySection({ siteMedia = {} }) {
                   src={mediaUrl(siteMedia.stayMainImage, 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80')}
                   alt="Luxury stay rooms"
                   className="sample-main-image"
+                  loading="lazy"
+                  decoding="async"
+                  fetchPriority="low"
                 />
                 <div className="refined-image-overlay" />
                 <motion.div
@@ -667,6 +687,9 @@ function EventsAndStaySection({ siteMedia = {} }) {
               <img
                 src={mediaUrl(siteMedia.stayFloatImage, 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80')}
                 alt="Premium suite"
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
               />
             </motion.div>
           </div>
@@ -758,7 +781,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
 
 function DiscoverMoreAarnaSection() {
   return (
-    <section className="discover-aarna-section">
+    <section className="discover-aarna-section deferred-section">
       <div className="discover-aarna-shell">
         <motion.div
           className="discover-aarna-box"
@@ -835,7 +858,16 @@ function DiscoverMoreAarnaSection() {
    HOME
    ═══════════════════════════════════════════════════════════ */
 function Home() {
+  usePageSeo({
+    title: 'The Perfect Wedding Destination',
+    description:
+      'Aarna is a luxury wedding destination near Mysore for elegant weddings, receptions, stays, and memorable celebrations.',
+    routePath: '/',
+  });
+
   const introVideoRef = useRef(null);
+  const introCompletedRef = useRef(false);
+  const introFallbackTimerRef = useRef(null);
   const autoTimerRef = useRef(null);
   const progressTimerRef = useRef(null);
   const progressRafRef = useRef(null);
@@ -853,7 +885,7 @@ function Home() {
   const [siteMedia, setSiteMedia] = useState({});
   useEffect(() => { fetchSiteMedia().then(setSiteMedia).catch(() => {}); }, []);
 
-  const [introVideoSrc, setIntroVideoSrc] = useState(landscapeVideo);
+  const [introVideoSrc, setIntroVideoSrc] = useState(getInitialIntroVideo);
   const [heroReady, setHeroReady] = useState(false);
   const [splashActive, setSplashActive] = useState(true);
   const [spacesVisible, setSpacesVisible] = useState(false);
@@ -863,7 +895,6 @@ function Home() {
 
   const [activeSpace, setActiveSpace] = useState(1);
 
-  const [progress, setProgress] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [openedSpace, setOpenedSpace] = useState(null);
@@ -876,6 +907,8 @@ function Home() {
   });
 
   const autoDuration = 3000;
+  const progressValue = useMotionValue(0);
+  const progressScaleX = useTransform(progressValue, [0, 100], [0, 1]);
 
   // Your existing static spaces (fallback)
   const ourSpaces = useMemo(
@@ -1104,6 +1137,7 @@ function Home() {
   );
 
   const clearTimers = useCallback(() => {
+    if (introFallbackTimerRef.current) window.clearTimeout(introFallbackTimerRef.current);
     if (autoTimerRef.current) window.clearInterval(autoTimerRef.current);
     if (progressTimerRef.current) window.clearInterval(progressTimerRef.current);
     if (progressRafRef.current) window.cancelAnimationFrame(progressRafRef.current);
@@ -1114,11 +1148,11 @@ function Home() {
   const triggerCardTransition = useCallback((nextId) => {
     setIsAnimating(true);
     setActiveSpace(nextId);
-    setProgress(0);
+    progressValue.set(0);
     setTitleAnimationKey((k) => k + 1);
     if (transitionLockTimerRef.current) window.clearTimeout(transitionLockTimerRef.current);
     transitionLockTimerRef.current = window.setTimeout(() => setIsAnimating(false), 620);
-  }, []);
+  }, [progressValue]);
 
   const goNext = useCallback(() => {
     if (isAnimating || openedSpace) return;
@@ -1153,20 +1187,20 @@ function Home() {
 
   const startAutoPlay = useCallback(() => {
     clearTimers();
-    setProgress(0);
+    progressValue.set(0);
     if (isPaused || openedSpace) return;
     const t0 = performance.now();
     const tick = (now) => {
       const elapsed = now - t0;
       const nextProgress = Math.min((elapsed / autoDuration) * 100, 100);
-      setProgress(nextProgress);
+      progressValue.set(nextProgress);
       if (nextProgress < 100 && !isPaused && !openedSpace) {
         progressRafRef.current = window.requestAnimationFrame(tick);
       }
     };
     progressRafRef.current = window.requestAnimationFrame(tick);
     autoTimerRef.current = window.setInterval(goNext, autoDuration);
-  }, [autoDuration, clearTimers, goNext, isPaused, openedSpace]);
+  }, [autoDuration, clearTimers, goNext, isPaused, openedSpace, progressValue]);
 
   useEffect(() => {
     const preloaded = [];
@@ -1183,7 +1217,15 @@ function Home() {
   }, [finalSpaces]);
 
   const handleIntroComplete = useCallback(() => {
+    if (introCompletedRef.current) return;
+    introCompletedRef.current = true;
+    if (introFallbackTimerRef.current) {
+      window.clearTimeout(introFallbackTimerRef.current);
+      introFallbackTimerRef.current = null;
+    }
+
     sessionStorage.setItem('introVideoPlayed', 'true');
+    setHasIntroPlayed(true);
 
     window.dispatchEvent(new Event('hideRealLogo'));
 
@@ -1299,6 +1341,7 @@ function Home() {
 
   useEffect(() => {
     if (hasIntroPlayed) {
+      introCompletedRef.current = true;
       setSplashActive(false);
       setHeroReady(true);
       setSpacesVisible(true);
@@ -1320,15 +1363,23 @@ function Home() {
   }, [siteMedia.heroVideoLandscape, siteMedia.heroVideoPortrait]);
 
   useEffect(() => {
-    document.title = 'Aarna – The Perfect Wedding Destination';
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute(
-        'content',
-        'Aarna – Where tradition meets trends and every celebration becomes a timeless memory.'
-      );
-  }, []);
-  
+    if (!splashActive || hasIntroPlayed) return undefined;
+
+    introCompletedRef.current = false;
+    if (introFallbackTimerRef.current) window.clearTimeout(introFallbackTimerRef.current);
+
+    introFallbackTimerRef.current = window.setTimeout(() => {
+      handleIntroComplete();
+    }, INTRO_FAILSAFE_MS);
+
+    return () => {
+      if (introFallbackTimerRef.current) {
+        window.clearTimeout(introFallbackTimerRef.current);
+        introFallbackTimerRef.current = null;
+      }
+    };
+  }, [splashActive, hasIntroPlayed, introVideoSrc, handleIntroComplete]);
+
   useEffect(() => {
     if (!spacesVisible) return;
     startAutoPlay();
@@ -1361,7 +1412,7 @@ function Home() {
 
   return (
     <LayoutGroup>
-      <div className="home-page">
+      <main id="main-content" className="home-page">
         <AnimatePresence>
           {splashActive && (
             <motion.div
@@ -1402,6 +1453,13 @@ function Home() {
                   playsInline
                   preload="auto"
                   onEnded={handleIntroComplete}
+                  onError={handleIntroComplete}
+                  onStalled={handleIntroComplete}
+                  onCanPlay={() => {
+                    if (introVideoRef.current?.paused) {
+                      introVideoRef.current.play().catch(() => {});
+                    }
+                  }}
                   key={introVideoSrc}
                   style={{
                     width: '100%',
@@ -1481,13 +1539,17 @@ function Home() {
 
             <section
               ref={spacesSectionRef}
-              className={`our-spaces-showcase ${spacesVisible ? 'open' : ''} ${spacesSlideUp ? 'slide-up' : ''}`}
+              className={`our-spaces-showcase deferred-section ${spacesVisible ? 'open' : ''} ${spacesSlideUp ? 'slide-up' : ''}`}
             >
               <div className="spaces-background">
                 <motion.img
                   src={activeItem?.image}
                   alt={activeItem?.title}
                   className="spaces-background-image"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                  sizes="100vw"
                   initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
@@ -1649,8 +1711,10 @@ function Home() {
                               alt={space.title}
                               className="space-thumb-photo"
                               ref={isCenter ? activeCardImageRef : null}
-                              loading={isCenter ? 'eager' : 'lazy'}
+                              loading="eager"
                               decoding="async"
+                              fetchPriority={isCenter ? 'high' : 'auto'}
+                              sizes={isCenter ? '(max-width: 991px) 78vw, 34vw' : '(max-width: 991px) 44vw, 26vw'}
                               animate={{ scale: isCenter ? 1.01 : 1 }}
                               whileHover={{ scale: 1.05 }}
                               transition={{
@@ -1748,8 +1812,7 @@ function Home() {
                               <div className="spaces-indicator-track">
                                 <motion.div
                                   className="spaces-indicator-fill"
-                                  animate={{ width: isActive ? `${progress}%` : '0%' }}
-                                  transition={{ duration: 0.1, ease: 'linear' }}
+                                  style={{ scaleX: isActive ? progressScaleX : 0 }}
                                 />
                               </div>
                             </button>
@@ -1845,7 +1908,7 @@ function Home() {
             </AnimatePresence>
           </>
         )}
-      </div>
+      </main>
     </LayoutGroup >
   );
 }

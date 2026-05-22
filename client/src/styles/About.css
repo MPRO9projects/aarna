@@ -122,6 +122,7 @@ button,
 .about-hero {
   position: relative;
   height: 100vh;
+  height: var(--app-height, 100vh);
   min-height: 650px;
   display: flex;
   align-items: center;
@@ -353,7 +354,7 @@ button,
 
 .about-text p {
   margin-bottom: 24px;
-  color: var(--text-soft);
+  color: #3b2a30;
   font-size: 1.15rem;
   line-height: 1.8;
   font-family: 'Gilda Display', serif;
@@ -608,6 +609,10 @@ button,
   margin: 0 auto;
 }
 
+.reference-book.is-compact {
+  transition-duration: 420ms;
+}
+
 .reference-book-page {
   position: absolute;
   inset: 0;
@@ -617,6 +622,10 @@ button,
   transform-style: preserve-3d;
   transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
+}
+
+.reference-book.is-compact .reference-book-page {
+  transition-duration: 420ms;
 }
 
 .reference-book-face {
@@ -633,6 +642,12 @@ button,
 
 .reference-book-face.back {
   transform: rotateY(180deg);
+}
+
+.reference-book.is-compact .reference-book-face {
+  box-shadow:
+    0 2px 12px rgba(197, 157, 115, 0.16),
+    inset 1px 0 8px rgba(0, 0, 0, 0.05);
 }
 
 .r-right {
@@ -718,6 +733,10 @@ button,
     ),
     linear-gradient(to left, rgba(255, 255, 255, 0.08) 0%, transparent 20%);
   mix-blend-mode: multiply;
+}
+
+.reference-book.is-compact .page-turn-shadow {
+  display: none;
 }
 
 .book-cover-content {
@@ -2240,6 +2259,552 @@ button,
 }
 
 /* Promise section - reference style layout */
+.about-vision-mission-section {
+  position: relative;
+  padding: 110px 0 40px;
+  background:
+    radial-gradient(circle at top left, rgba(197, 157, 115, 0.16), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(111, 31, 59, 0.08), transparent 32%),
+    linear-gradient(180deg, #fffaf5 0%, #f8f1e8 100%);
+  overflow: hidden;
+}
+
+.about-vision-mission-shell {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 58px 46px 54px;
+  border: 1px solid rgba(111, 31, 59, 0.08);
+  border-radius: 36px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 241, 232, 0.88) 100%);
+  box-shadow:
+    0 28px 64px rgba(64, 21, 30, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  perspective: 2200px;
+}
+
+.about-vision-mission-shell::before,
+.about-vision-mission-shell::after {
+  content: '';
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.22;
+}
+
+.about-vision-mission-shell::before {
+  top: -48px;
+  right: 8%;
+  background: radial-gradient(circle, rgba(197, 157, 115, 0.45) 0%, transparent 72%);
+}
+
+.about-vision-mission-shell::after {
+  bottom: -58px;
+  left: 6%;
+  background: radial-gradient(circle, rgba(111, 31, 59, 0.2) 0%, transparent 72%);
+}
+
+.about-vision-mission-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(1px);
+  opacity: 0.46;
+  pointer-events: none;
+  animation: aboutVisionFloat 8.5s ease-in-out infinite;
+}
+
+.about-vision-mission-orb-one {
+  top: 110px;
+  left: 5%;
+  width: 34px;
+  height: 34px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(197, 157, 115, 0.55));
+}
+
+.about-vision-mission-orb-two {
+  right: 8%;
+  bottom: 88px;
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(111, 31, 59, 0.2));
+  animation-delay: -3s;
+}
+
+.about-vision-mission-head {
+  max-width: 760px;
+  margin: 0 auto 42px;
+  text-align: center;
+}
+
+.about-vision-mission-kicker {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: rgba(111, 31, 59, 0.68) !important;
+  letter-spacing: 0.32em;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.about-vision-mission-title {
+  margin: 0;
+  color: #3f2b31;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  line-height: 1.06;
+  font-weight: 500;
+  text-align: center;
+}
+
+.about-vision-mission-title .promise-rise-root {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.about-vision-mission-rule {
+  margin: 18px auto 20px;
+}
+
+.about-vision-mission-intro {
+  margin: 0 auto;
+  max-width: 700px;
+  color: #6b5a54;
+  font-size: 1.02rem;
+  line-height: 1.9;
+  font-family: 'Gilda Display', serif;
+}
+
+.about-vision-mission-tagline {
+  margin: 16px 0 0;
+  color: rgba(111, 31, 59, 0.8);
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.about-vision-mission-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px;
+  opacity: 0;
+  transform: translateY(18px) scale(0.98);
+}
+
+.about-vision-mission-bookstage {
+  position: relative;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 18px 0 4px;
+  perspective: 2200px;
+}
+
+.about-vision-mission-spine {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 50%;
+  width: 10px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(197, 157, 115, 0.72) 0%, rgba(111, 31, 59, 0.92) 50%, rgba(197, 157, 115, 0.72) 100%);
+  box-shadow:
+    0 8px 18px rgba(64, 21, 30, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  z-index: 1;
+  opacity: 0;
+  transform: translateX(-50%) scaleY(0.7);
+}
+
+.about-vision-mission-spine::before,
+.about-vision-mission-spine::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  height: 22px;
+  transform: translateX(-50%);
+  background: rgba(197, 157, 115, 0.72);
+  border-radius: 999px;
+}
+
+.about-vision-mission-spine::before {
+  top: 34px;
+}
+
+.about-vision-mission-spine::after {
+  bottom: 34px;
+}
+
+.about-vision-card {
+  position: relative;
+  padding: 36px 30px 32px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 241, 232, 0.92) 100%);
+  border: 1px solid rgba(111, 31, 59, 0.08);
+  box-shadow: 0 20px 45px rgba(64, 21, 30, 0.08);
+  overflow: hidden;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  min-height: 100%;
+  z-index: 2;
+}
+
+.about-vision-mission-cover {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(50% - 10px);
+  z-index: 4;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.about-vision-mission-cover-left {
+  left: 0;
+  transform-origin: left center;
+  transform: translateX(0) rotate(0deg);
+  opacity: 1;
+}
+
+.about-vision-mission-cover-right {
+  right: 0;
+  transform-origin: right center;
+  transform: translateX(0) rotate(0deg);
+  opacity: 1;
+}
+
+.about-vision-mission-cover-inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 34px 22px;
+  text-align: center;
+  color: #fff7f1;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, #5a1129 0%, #2f0816 100%);
+  border: 2px solid rgba(197, 157, 115, 0.5);
+  box-shadow:
+    0 28px 60px rgba(45, 10, 24, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.about-vision-mission-cover-left .about-vision-mission-cover-inner {
+  border-radius: 30px 16px 16px 30px;
+  border-right: 3px solid rgba(197, 157, 115, 0.56);
+}
+
+.about-vision-mission-cover-right .about-vision-mission-cover-inner {
+  border-radius: 16px 30px 30px 16px;
+  border-left: 3px solid rgba(197, 157, 115, 0.56);
+}
+
+.about-vision-mission-cover-inner::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(197, 157, 115, 0.34);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.about-vision-mission-cover-inner::after {
+  content: '';
+  position: absolute;
+  top: 24px;
+  bottom: 24px;
+  width: 24px;
+  pointer-events: none;
+  opacity: 0.44;
+  background:
+    radial-gradient(circle, rgba(197, 157, 115, 0.48) 1px, transparent 1.5px) center/10px 18px repeat-y;
+}
+
+.about-vision-mission-cover-left .about-vision-mission-cover-inner::after {
+  right: 10px;
+}
+
+.about-vision-mission-cover-right .about-vision-mission-cover-inner::after {
+  left: 10px;
+}
+
+.about-vision-mission-cover-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 240, 230, 0.84);
+}
+
+.about-vision-mission-cover-brand {
+  font-family: 'Samarkan', 'Times New Roman', serif;
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  line-height: 0.92;
+  color: #f7d8ae;
+  text-shadow: 0 6px 20px rgba(0, 0, 0, 0.24);
+}
+
+.about-vision-mission-cover-copy {
+  max-width: 220px;
+  font-family: 'Gilda Display', serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255, 244, 235, 0.88);
+}
+
+.about-vision-mission-seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 86px;
+  height: 86px;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, #fbe0b8 0%, #d4a86d 46%, #9f6d3d 100%);
+  box-shadow:
+    0 18px 30px rgba(64, 21, 30, 0.22),
+    inset 0 0 0 6px rgba(255, 247, 237, 0.24);
+  opacity: 1;
+}
+
+.about-vision-mission-seal::before,
+.about-vision-mission-seal::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.about-vision-mission-seal::before {
+  width: 42px;
+  height: 42px;
+  background: rgba(111, 31, 59, 0.2);
+}
+
+.about-vision-mission-seal::after {
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.about-vision-mission-bookstage.is-looping .about-vision-mission-cover-left {
+  animation: visionMissionCoverLeftLoop 7.2s linear infinite;
+}
+
+.about-vision-mission-bookstage.is-looping .about-vision-mission-cover-right {
+  animation: visionMissionCoverRightLoop 7.2s linear infinite;
+}
+
+.about-vision-mission-bookstage.is-looping .about-vision-mission-seal {
+  animation: visionMissionSealLoop 7.2s linear infinite;
+}
+
+.about-vision-mission-bookstage.is-looping .about-vision-mission-spine {
+  animation: visionMissionSpineLoop 7.2s linear infinite;
+}
+
+.about-vision-mission-bookstage.is-looping .about-vision-mission-grid {
+  animation: visionMissionGridLoop 7.2s linear infinite;
+}
+
+@keyframes visionMissionCoverLeftLoop {
+  0%,
+  18%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  28%,
+  82% {
+    transform: translateX(-108%) rotate(-7deg);
+    opacity: 0;
+  }
+}
+
+@keyframes visionMissionCoverRightLoop {
+  0%,
+  18%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  28%,
+  82% {
+    transform: translateX(108%) rotate(7deg);
+    opacity: 0;
+  }
+}
+
+@keyframes visionMissionSealLoop {
+  0%,
+  12%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  22%,
+  82% {
+    transform: translate(-50%, calc(-50% + 12px)) scale(0.74);
+    opacity: 0;
+  }
+}
+
+@keyframes visionMissionSpineLoop {
+  0%,
+  16%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scaleY(0.7);
+  }
+  25%,
+  82% {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+
+@keyframes visionMissionGridLoop {
+  0%,
+  18%,
+  100% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  28%,
+  82% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.about-vision-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18px;
+  background: linear-gradient(180deg, rgba(111, 31, 59, 0.14) 0%, rgba(197, 157, 115, 0.12) 100%);
+  pointer-events: none;
+}
+
+.about-vision-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), transparent 28%, transparent 74%, rgba(111, 31, 59, 0.04));
+  pointer-events: none;
+}
+
+.about-vision-card-glow {
+  position: absolute;
+  inset: -20% auto auto -8%;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(197, 157, 115, 0.18) 0%, transparent 72%);
+  pointer-events: none;
+}
+
+.about-mission-card .about-vision-card-glow {
+  inset: auto -8% -20% auto;
+  background: radial-gradient(circle, rgba(111, 31, 59, 0.14) 0%, transparent 72%);
+}
+
+.about-vision-card {
+  transform-origin: right center;
+}
+
+.about-mission-card {
+  transform-origin: left center;
+}
+
+.about-vision-card::before {
+  right: 0;
+  border-radius: 12px 28px 28px 12px;
+}
+
+.about-mission-card::before {
+  left: 0;
+  right: auto;
+  border-radius: 28px 12px 12px 28px;
+}
+
+.about-vision-card-label {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: #472d34;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.45rem, 2.3vw, 2rem);
+  line-height: 1.12;
+  font-weight: 600;
+}
+
+.about-vision-card-eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: rgba(111, 31, 59, 0.7);
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.about-vision-card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.about-vision-card-list li {
+  position: relative;
+  padding-left: 26px;
+  color: #6a5a55;
+  font-size: 0.98rem;
+  line-height: 1.75;
+  font-family: 'Gilda Display', serif;
+}
+
+.about-vision-card-list li::before {
+  content: '';
+  position: absolute;
+  top: 0.82em;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, #c59d73 0%, #8f6d4f 100%);
+  box-shadow: 0 0 0 6px rgba(197, 157, 115, 0.1);
+}
+
+@keyframes aboutVisionFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) scale(1.06);
+  }
+}
+
 .promise-ref-section {
   padding: 110px 0;
   background: #f6f2ed;
@@ -2364,6 +2929,27 @@ button,
 }
 
 @media (max-width: 1024px) {
+  .about-vision-mission-shell {
+    padding: 42px 28px;
+  }
+
+  .about-vision-mission-grid {
+    gap: 22px;
+  }
+
+  .about-vision-mission-spine {
+    width: 8px;
+  }
+
+  .about-vision-mission-cover-copy {
+    max-width: 180px;
+    font-size: 0.86rem;
+  }
+
+  .about-vision-card {
+    padding: 28px 24px 24px;
+  }
+
   .promise-ref-grid {
     max-width: 880px;
   }
@@ -2378,6 +2964,142 @@ button,
 }
 
 @media (max-width: 768px) {
+  .about-vision-mission-section {
+    padding: 72px 0 24px;
+  }
+
+  .about-vision-mission-shell {
+    padding: 28px 16px 24px;
+    border-radius: 22px;
+  }
+
+  .about-vision-mission-head {
+    max-width: 100%;
+    margin-bottom: 22px;
+  }
+
+  .about-vision-mission-kicker {
+    font-size: 0.56rem;
+    letter-spacing: 0.16em;
+    margin-bottom: 12px;
+  }
+
+  .about-vision-mission-title {
+    font-size: clamp(1.45rem, 6vw, 2rem);
+    line-height: 1.12;
+  }
+
+  .about-vision-mission-title .promise-rise-root {
+    justify-content: center;
+  }
+
+  .about-vision-mission-intro {
+    font-size: 0.9rem;
+    line-height: 1.66;
+  }
+
+  .about-vision-mission-tagline {
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+  }
+
+  .about-vision-mission-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .about-vision-mission-bookstage {
+    padding: 6px 0 2px;
+    max-width: 100%;
+  }
+
+  .about-vision-mission-spine {
+    display: none;
+  }
+
+  .about-vision-mission-cover {
+    display: block;
+    width: calc(50% - 6px);
+  }
+
+  .about-vision-mission-seal {
+    display: block;
+    width: 64px;
+    height: 64px;
+  }
+
+  .about-vision-mission-orb {
+    display: none;
+  }
+
+  .about-vision-mission-cover-inner {
+    gap: 10px;
+    padding: 22px 12px;
+  }
+
+  .about-vision-mission-cover-inner::before {
+    inset: 8px;
+  }
+
+  .about-vision-mission-cover-inner::after {
+    top: 16px;
+    bottom: 16px;
+    width: 16px;
+    background:
+      radial-gradient(circle, rgba(197, 157, 115, 0.48) 1px, transparent 1.5px) center/8px 14px repeat-y;
+  }
+
+  .about-vision-mission-cover-left .about-vision-mission-cover-inner::after {
+    right: 6px;
+  }
+
+  .about-vision-mission-cover-right .about-vision-mission-cover-inner::after {
+    left: 6px;
+  }
+
+  .about-vision-mission-cover-kicker {
+    font-size: 0.54rem;
+    letter-spacing: 0.18em;
+  }
+
+  .about-vision-mission-cover-brand {
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+  }
+
+  .about-vision-mission-cover-copy {
+    max-width: 118px;
+    font-size: 0.64rem;
+    line-height: 1.45;
+  }
+
+  .about-vision-mission-seal::before {
+    width: 30px;
+    height: 30px;
+  }
+
+  .about-vision-mission-seal::after {
+    width: 12px;
+    height: 12px;
+  }
+
+  .about-vision-card {
+    min-height: 0;
+    transform: none !important;
+    padding: 22px 18px 18px;
+    overflow: visible;
+  }
+
+  .about-vision-card-label {
+    font-size: 1.24rem;
+    line-height: 1.06;
+  }
+
+  .about-vision-card-list li {
+    font-size: 0.8rem;
+    line-height: 1.46;
+  }
+
   .promise-ref-section {
     padding: 80px 0;
   }
@@ -2417,6 +3139,116 @@ button,
 }
 
 @media (max-width: 520px) {
+  .about-vision-mission-section .container {
+    padding: 0 12px;
+  }
+
+  .about-vision-mission-shell {
+    padding: 22px 12px 18px;
+    border-radius: 18px;
+  }
+
+  .about-vision-mission-rule {
+    margin: 12px auto 14px;
+    width: 48px;
+  }
+
+  .about-vision-mission-kicker {
+    font-size: 0.48rem;
+    letter-spacing: 0.12em;
+  }
+
+  .about-vision-mission-title {
+    font-size: clamp(1.2rem, 7.4vw, 1.55rem);
+    line-height: 1.16;
+  }
+
+  .about-vision-mission-intro {
+    font-size: 0.74rem;
+    line-height: 1.5;
+  }
+
+  .about-vision-mission-tagline {
+    font-size: 0.62rem;
+    margin-top: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .about-vision-mission-bookstage {
+    padding-top: 4px;
+  }
+
+  .about-vision-mission-spine {
+    display: none;
+  }
+
+  .about-vision-mission-cover {
+    width: calc(50% - 4px);
+  }
+
+  .about-vision-mission-cover-inner {
+    gap: 8px;
+    padding: 18px 8px;
+  }
+
+  .about-vision-mission-cover-kicker {
+    font-size: 0.46rem;
+    letter-spacing: 0.12em;
+  }
+
+  .about-vision-mission-cover-brand {
+    font-size: clamp(1.25rem, 6.8vw, 1.7rem);
+  }
+
+  .about-vision-mission-cover-copy {
+    max-width: 94px;
+    font-size: 0.56rem;
+    line-height: 1.32;
+  }
+
+  .about-vision-mission-seal {
+    width: 52px;
+    height: 52px;
+  }
+
+  .about-vision-card {
+    padding: 16px 12px 14px;
+    border-radius: 16px;
+    overflow: visible;
+  }
+
+  .about-vision-card::before {
+    width: 10px;
+  }
+
+  .about-vision-card-label {
+    margin-bottom: 10px;
+    font-size: 0.96rem;
+    line-height: 1.08;
+  }
+
+  .about-vision-card-eyebrow {
+    margin-bottom: 6px;
+    font-size: 0.56rem;
+    letter-spacing: 0.12em;
+  }
+
+  .about-vision-card-list {
+    gap: 8px;
+  }
+
+  .about-vision-card-list li {
+    padding-left: 16px;
+    font-size: 0.68rem;
+    line-height: 1.38;
+  }
+
+  .about-vision-card-list li::before {
+    width: 8px;
+    height: 8px;
+    box-shadow: 0 0 0 4px rgba(197, 157, 115, 0.1);
+  }
+
   .promise-ref-grid {
     grid-template-columns: 1fr 1fr;
   }

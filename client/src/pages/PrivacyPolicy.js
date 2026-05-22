@@ -2,15 +2,22 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import '../styles/PrivacyTerms.css';
+import { usePageSeo } from '../hooks/usePageSeo';
 
 const PrivacyPolicy = () => {
+  usePageSeo({
+    title: 'Privacy Policy',
+    description:
+      'Read the Aarna privacy policy to understand how booking enquiries, contact details, and guest information are collected and used.',
+    routePath: '/privacy-policy',
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    document.title = 'Privacy Policy | Aarna Destination Venue';
   }, []);
 
   return (
-    <div className="privacy-terms-page">
+    <main id="main-content" className="privacy-terms-page">
       {/* Hero Section */}
       <section className="pt-hero-section">
         <div className="pt-hero-overlay" />
@@ -159,7 +166,7 @@ const PrivacyPolicy = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -9,6 +9,8 @@ import {
   fetchAnalytics,
   fetchSiteMedia, updateSiteMedia, resolveMediaUrl,
 } from '../../services/api';
+import { usePageSeo } from '../../hooks/usePageSeo';
+import { optimizeImageFile } from '../../utils/mediaOptimization';
 
 const px = (img) => resolveMediaUrl(img);
 
@@ -36,7 +38,7 @@ function ImageField({ label, name, preview, onChange, required }) {
   return (
     <div className="form-group">
       <label>{label}</label>
-      {preview && <div className="img-preview"><img src={preview} alt="preview" /></div>}
+      {preview && <div className="img-preview"><img src={preview} alt="preview" loading="lazy" decoding="async" /></div>}
       <input type="file" accept="image/*" name={name} onChange={onChange} required={required} />
     </div>
   );
@@ -49,7 +51,7 @@ function VideoField({ label, name, currentSrc, onChange }) {
       <label>{label}</label>
       {currentSrc && (
         <div className="video-preview">
-          <video src={resolveMediaUrl(currentSrc)} controls style={{ width: '100%', maxHeight: 140, borderRadius: 8 }} />
+          <video src={resolveMediaUrl(currentSrc)} controls preload="metadata" style={{ width: '100%', maxHeight: 140, borderRadius: 8 }} />
         </div>
       )}
       <input type="file" accept="video/mp4,video/*" name={name} onChange={onChange} />
@@ -58,6 +60,13 @@ function VideoField({ label, name, currentSrc, onChange }) {
 }
 
 export default function AdminPanel() {
+  usePageSeo({
+    title: 'Admin Panel',
+    description: 'Administrative dashboard for managing Aarna website content.',
+    routePath: '/admin',
+    robots: 'noindex,nofollow',
+  });
+
   const [tab, setTab] = useState('analytics');
 
   // Data
@@ -105,24 +114,78 @@ export default function AdminPanel() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const loadAll = useCallback(async () => {
-    const [s, sv, g, c, st, sm, an] = await Promise.all([
-      fetchSections(), fetchServices(), fetchGallery(), fetchContacts(),
-      fetchSettings(), fetchSiteMedia(), fetchAnalytics(),
-    ]).catch(() => [[], [], [], [], {}, {}, null]);
-    setSections((s || []).map(x => ({ ...x, image: px(x.image) })));
-    setServices((sv || []).map(x => ({ ...x, image: px(x.image) })));
-    setGallery((g || []).map(x => ({ ...x, image: px(x.image) })));
-    setContacts(c || []);
-    setSettings(st || {});
-    setSiteMedia(sm || {});
-    setAnalytics(an);
+  const loadSectionsData = useCallback(async () => {
+    const data = await fetchSections().catch(() => []);
+    setSections((data || []).map(x => ({ ...x, image: px(x.image) })));
   }, []);
 
-  useEffect(() => { loadAll(); }, [loadAll]);
+  const loadServicesData = useCallback(async () => {
+    const data = await fetchServices().catch(() => []);
+    setServices((data || []).map(x => ({ ...x, image: px(x.image) })));
+  }, []);
+
+  const loadGalleryData = useCallback(async () => {
+    const data = await fetchGallery().catch(() => []);
+    setGallery((data || []).map(x => ({ ...x, image: px(x.image) })));
+  }, []);
+
+  const loadContactsData = useCallback(async () => {
+    const data = await fetchContacts().catch(() => []);
+    setContacts(data || []);
+  }, []);
+
+  const loadSettingsData = useCallback(async () => {
+    const data = await fetchSettings().catch(() => ({}));
+    setSettings(data || {});
+  }, []);
+
+  const loadSiteMediaData = useCallback(async () => {
+    const data = await fetchSiteMedia().catch(() => ({}));
+    setSiteMedia(data || {});
+  }, []);
+
+  const loadAnalyticsData = useCallback(async () => {
+    const data = await fetchAnalytics().catch(() => null);
+    setAnalytics(data);
+  }, []);
+
   useEffect(() => {
-    const t = setInterval(() => fetchAnalytics().then(setAnalytics).catch(() => {}), 30000);
+    loadContactsData();
+    loadSettingsData();
+    loadSiteMediaData();
+  }, [loadContactsData, loadSettingsData, loadSiteMediaData]);
+
+  useEffect(() => {
+    if (tab === 'analytics' && !analytics) loadAnalyticsData();
+    if (tab === 'sections' && sections.length === 0) loadSectionsData();
+    if (tab === 'services' && services.length === 0) loadServicesData();
+    if (tab === 'gallery' && gallery.length === 0) loadGalleryData();
+    if (tab === 'contacts' && contacts.length === 0) loadContactsData();
+  }, [
+    analytics,
+    contacts.length,
+    gallery.length,
+    loadAnalyticsData,
+    loadContactsData,
+    loadGalleryData,
+    loadSectionsData,
+    loadServicesData,
+    sections.length,
+    services.length,
+    tab,
+  ]);
+
+  useEffect(() => {
+    if (tab !== 'analytics') return undefined;
+    const t = setInterval(() => loadAnalyticsData(), 30000);
     return () => clearInterval(t);
+  }, [loadAnalyticsData, tab]);
+
+  const handleOptimizedImageSelect = useCallback(async (file) => {
+    if (!file) return;
+    const optimized = await optimizeImageFile(file);
+    setFImage(optimized);
+    setFImagePreview(URL.createObjectURL(optimized));
   }, []);
 
   const buildFD = (fields) => {
@@ -144,8 +207,7 @@ export default function AdminPanel() {
     if (editId && editType === 'section') await updateSection(editId, fd);
     else await addSection(fd);
     resetForm();
-    const d = await fetchSections();
-    setSections(d.map(x => ({ ...x, image: px(x.image) })));
+    await loadSectionsData();
     setLoading(false);
   };
 
@@ -155,8 +217,7 @@ export default function AdminPanel() {
     if (editId && editType === 'service') await updateService(editId, fd);
     else await addService(fd);
     resetForm();
-    const d = await fetchServices();
-    setServices(d.map(x => ({ ...x, image: px(x.image) })));
+    await loadServicesData();
     setLoading(false);
   };
 
@@ -165,17 +226,16 @@ export default function AdminPanel() {
     const fd = buildFD({ title: fTitle, category: fCategory });
     await addGalleryImage(fd);
     resetForm();
-    const d = await fetchGallery();
-    setGallery(d.map(x => ({ ...x, image: px(x.image) })));
+    await loadGalleryData();
     setLoading(false);
   };
 
   const handleDelete = async (type, id) => {
     if (!window.confirm('Delete this item?')) return;
-    if (type === 'section') { await deleteSection(id); const d = await fetchSections(); setSections(d.map(x => ({ ...x, image: px(x.image) }))); }
-    if (type === 'service') { await deleteService(id); const d = await fetchServices(); setServices(d.map(x => ({ ...x, image: px(x.image) }))); }
-    if (type === 'gallery') { await deleteGalleryImage(id); const d = await fetchGallery(); setGallery(d.map(x => ({ ...x, image: px(x.image) }))); }
-    if (type === 'contact') { await deleteContact(id); const d = await fetchContacts(); setContacts(d); }
+    if (type === 'section') { await deleteSection(id); await loadSectionsData(); }
+    if (type === 'service') { await deleteService(id); await loadServicesData(); }
+    if (type === 'gallery') { await deleteGalleryImage(id); await loadGalleryData(); }
+    if (type === 'contact') { await deleteContact(id); await loadContactsData(); }
   };
 
   const [smFiles, setSmFiles] = useState({});
@@ -193,10 +253,21 @@ export default function AdminPanel() {
     alert('Page media saved!');
   };
 
-  const handleSmFile = (key, file, isVideo) => {
-    setSmFiles(prev => ({ ...prev, [key]: file }));
-    if (!isVideo) setSmPreviews(prev => ({ ...prev, [key]: URL.createObjectURL(file) }));
-  };
+  const handleSmFile = useCallback(async (key, file, isVideo) => {
+    if (!file) return;
+
+    if (isVideo) {
+      if (file.size > 60 * 1024 * 1024) {
+        alert('This video is quite large. For faster website loading, try uploading a compressed video under 60 MB if possible.');
+      }
+      setSmFiles(prev => ({ ...prev, [key]: file }));
+      return;
+    }
+
+    const optimized = await optimizeImageFile(file);
+    setSmFiles(prev => ({ ...prev, [key]: optimized }));
+    setSmPreviews(prev => ({ ...prev, [key]: URL.createObjectURL(optimized) }));
+  }, []);
 
   const unread = contacts.filter(c => !c.read).length;
 
@@ -240,7 +311,7 @@ export default function AdminPanel() {
                 <h1>Analytics</h1>
                 <p className="ap-page-sub">Live visitor insights — auto-refreshes every 30s</p>
               </div>
-              <button className="ap-btn-ghost" onClick={() => fetchAnalytics().then(setAnalytics)}>↻ Refresh</button>
+              <button className="ap-btn-ghost" onClick={() => loadAnalyticsData()}>↻ Refresh</button>
             </div>
 
             {!analytics ? (
@@ -358,7 +429,7 @@ export default function AdminPanel() {
                   label={editId ? 'Change Image (leave empty to keep current)' : 'Upload Image *'}
                   required={!editId}
                   preview={fImagePreview}
-                  onChange={e => { const f = e.target.files[0]; if (f) { setFImage(f); setFImagePreview(URL.createObjectURL(f)); } }}
+                  onChange={async e => { const f = e.target.files[0]; if (f) await handleOptimizedImageSelect(f); }}
                 />
                 <div className="ap-form-actions">
                   <button type="submit" disabled={loading} className="ap-btn-primary">{loading ? 'Saving…' : editId ? 'Update Section' : 'Add Section'}</button>
@@ -371,7 +442,7 @@ export default function AdminPanel() {
             <div className="ap-grid">
               {sections.map(item => (
                 <div key={item.id} className="ap-card">
-                  {item.image && <img src={item.image} alt={item.title} className="ap-card-img" />}
+                  {item.image && <img src={item.image} alt={item.title} className="ap-card-img" loading="lazy" decoding="async" />}
                   <div className="ap-card-body">
                     <h3>{item.title}</h3>
                     {item.eyebrow && <span className="ap-tag">{item.eyebrow}</span>}
@@ -404,7 +475,7 @@ export default function AdminPanel() {
                   label={editId ? 'Change Image (leave empty to keep current)' : 'Upload Image'}
                   required={false}
                   preview={fImagePreview}
-                  onChange={e => { const f = e.target.files[0]; if (f) { setFImage(f); setFImagePreview(URL.createObjectURL(f)); } }}
+                  onChange={async e => { const f = e.target.files[0]; if (f) await handleOptimizedImageSelect(f); }}
                 />
                 <div className="ap-form-actions">
                   <button type="submit" disabled={loading} className="ap-btn-primary">{loading ? 'Saving…' : editId ? 'Update Service' : 'Add Service'}</button>
@@ -417,7 +488,7 @@ export default function AdminPanel() {
             <div className="ap-grid">
               {services.map(item => (
                 <div key={item.id} className="ap-card">
-                  {item.image && <img src={item.image} alt={item.title} className="ap-card-img" />}
+                  {item.image && <img src={item.image} alt={item.title} className="ap-card-img" loading="lazy" decoding="async" />}
                   <div className="ap-card-body">
                     <h3>{item.title}</h3>
                     {item.subtitle && <span className="ap-tag-sm">{item.subtitle}</span>}
@@ -450,7 +521,7 @@ export default function AdminPanel() {
                     </select>
                   </div>
                 </div>
-                <ImageField label="Upload Image *" required preview={fImagePreview} onChange={e => { const f = e.target.files[0]; if (f) { setFImage(f); setFImagePreview(URL.createObjectURL(f)); } }} />
+                <ImageField label="Upload Image *" required preview={fImagePreview} onChange={async e => { const f = e.target.files[0]; if (f) await handleOptimizedImageSelect(f); }} />
                 <div className="ap-form-actions">
                   <button type="submit" disabled={loading} className="ap-btn-primary">{loading ? 'Uploading…' : 'Add to Gallery'}</button>
                 </div>
@@ -461,7 +532,7 @@ export default function AdminPanel() {
             <div className="ap-grid ap-grid-gallery">
               {gallery.map(img => (
                 <div key={img.id} className="ap-card ap-card-gallery">
-                  {img.image && <img src={img.image} alt={img.title} className="ap-card-img ap-card-img-tall" />}
+                  {img.image && <img src={img.image} alt={img.title} className="ap-card-img ap-card-img-tall" loading="lazy" decoding="async" />}
                   <div className="ap-card-body ap-card-body-sm">
                     <h3>{img.title}</h3>
                     <span className="ap-cat-tag">{img.category}</span>
@@ -504,12 +575,12 @@ export default function AdminPanel() {
                 <div className="ap-form-row">
                   <div className="form-group">
                     <label>Main Image</label>
-                    <div className="img-preview"><img src={smPreviews.eventMainImage || px(siteMedia.eventMainImage) || ''} alt="" /></div>
+                    <div className="img-preview"><img src={smPreviews.eventMainImage || px(siteMedia.eventMainImage) || '/first.png'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('eventMainImage', e.target.files[0], false); }} />
                   </div>
                   <div className="form-group">
                     <label>Floating Card Image</label>
-                    <div className="img-preview"><img src={smPreviews.eventFloatImage || px(siteMedia.eventFloatImage) || ''} alt="" /></div>
+                    <div className="img-preview"><img src={smPreviews.eventFloatImage || px(siteMedia.eventFloatImage) || '/second.png'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('eventFloatImage', e.target.files[0], false); }} />
                   </div>
                 </div>
@@ -521,13 +592,54 @@ export default function AdminPanel() {
                 <div className="ap-form-row">
                   <div className="form-group">
                     <label>Main Image</label>
-                    <div className="img-preview"><img src={smPreviews.stayMainImage || px(siteMedia.stayMainImage) || ''} alt="" /></div>
+                    <div className="img-preview"><img src={smPreviews.stayMainImage || px(siteMedia.stayMainImage) || ''} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('stayMainImage', e.target.files[0], false); }} />
                   </div>
                   <div className="form-group">
                     <label>Floating Card Image</label>
-                    <div className="img-preview"><img src={smPreviews.stayFloatImage || px(siteMedia.stayFloatImage) || ''} alt="" /></div>
+                    <div className="img-preview"><img src={smPreviews.stayFloatImage || px(siteMedia.stayFloatImage) || ''} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('stayFloatImage', e.target.files[0], false); }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="ap-form-card">
+                <h2 className="ap-form-title">🖼️ About Page Images</h2>
+                <p className="ap-hint">Hero and intro images used across the About page.</p>
+                <div className="ap-form-row">
+                  <div className="form-group">
+                    <label>Hero Background Image</label>
+                    <div className="img-preview"><img src={smPreviews.aboutHeroImage || px(siteMedia.aboutHeroImage) || '/about-hero.jpg'} alt="" loading="lazy" decoding="async" /></div>
+                    <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('aboutHeroImage', e.target.files[0], false); }} />
+                  </div>
+                  <div className="form-group">
+                    <label>Intro Main Image</label>
+                    <div className="img-preview"><img src={smPreviews.aboutIntroMainImage || px(siteMedia.aboutIntroMainImage) || '/first.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('aboutIntroMainImage', e.target.files[0], false); }} />
+                  </div>
+                </div>
+                <div className="ap-form-row">
+                  <div className="form-group">
+                    <label>Intro Floating Image</label>
+                    <div className="img-preview"><img src={smPreviews.aboutIntroFloatImage || px(siteMedia.aboutIntroFloatImage) || '/second.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('aboutIntroFloatImage', e.target.files[0], false); }} />
+                  </div>
+                  <div className="form-group">
+                    <label>Promise Section Image</label>
+                    <div className="img-preview"><img src={smPreviews.aboutPromiseImage || px(siteMedia.aboutPromiseImage) || 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82'} alt="" loading="lazy" decoding="async" /></div>
+                    <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('aboutPromiseImage', e.target.files[0], false); }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="ap-form-card">
+                <h2 className="ap-form-title">🖼️ Contact Page Images</h2>
+                <p className="ap-hint">Hero image used at the top of the Contact Us page.</p>
+                <div className="ap-form-row">
+                  <div className="form-group">
+                    <label>Hero Background Image</label>
+                    <div className="img-preview"><img src={smPreviews.contactHeroImage || px(siteMedia.contactHeroImage) || '/contact.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('contactHeroImage', e.target.files[0], false); }} />
                   </div>
                 </div>
               </div>

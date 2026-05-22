@@ -1,70 +1,210 @@
-# Getting Started with Create React App
+# AARNA Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
+
+This folder contains the React frontend for the AARNA WEBSITE project.
+
+It is responsible for:
+
+- rendering the public website
+- handling page navigation
+- showing the admin panel UI
+- calling backend APIs for sections, services, gallery, settings, contacts, analytics, and site media
+- displaying animations, branded visuals, and responsive layouts
+
+## Tech Stack
+
+- React `19.2.4`
+- React DOM `19.2.4`
+- React Router DOM `7.13.1`
+- React Scripts `5.0.1`
+- Framer Motion `12.38.0`
+- GSAP `3.14.2`
+- AOS `2.3.4`
+- Lucide React `1.7.0`
+- ColorThief `3.3.1`
+- Web Vitals `2.1.4`
+
+## Available Routes
+
+The frontend uses `HashRouter`, so deployed URLs commonly use `#/`.
+
+### Public Routes
+
+- `/`
+- `/about`
+- `/contact`
+- `/privacy-policy`
+- `/terms-of-service`
+
+### Admin Route
+
+- `/admin`
+
+Production examples:
+
+- `https://aarna.net.in/#/`
+- `https://aarna.net.in/#/admin`
+
+## Project Structure
+
+```text
+client/
+|-- public/
+|-- src/
+|   |-- Assets/
+|   |   |-- fonts/
+|   |   `-- video/
+|   |-- components/
+|   |-- hooks/
+|   |-- pages/
+|   |   `-- Admin/
+|   |-- services/
+|   `-- styles/
+|-- package.json
+|-- package-lock.json
+`-- README.md
+```
+
+## Key Frontend Files
+
+- `src/App.js` - main app routing and shared layout handling
+- `src/components/` - reusable UI elements like header, footer, and helpers
+- `src/pages/` - main page screens
+- `src/pages/Admin/AdminPanel.js` - admin dashboard UI
+- `src/hooks/` - frontend data and settings hooks
+- `src/services/api.js` - backend API communication layer
+- `src/styles/` - page and shared styles
+
+## Installation
+
+From the `client` folder:
+
+```sh
+npm install
+```
+
+## Run in Development
+
+From the `client` folder:
+
+```sh
+npm start
+```
+
+This starts the frontend on:
+
+- `http://localhost:3000`
+
+## Build for Production
+
+```sh
+npm run build
+```
+
+This creates the production output in:
+
+- `client/build/`
+
+## Run Tests
+
+```sh
+npm test
+```
 
 ## Available Scripts
 
-In the project directory, you can run:
+- `npm start` - starts the React development server using `react-scripts start --no-cache`
+- `npm run build` - creates a production build
+- `npm test` - runs the frontend test runner
+- `npm run eject` - ejects the React configuration
 
-### `npm start`
+## Backend Connection
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The frontend communicates with the backend API through:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- local development proxy in `client/package.json`
+- API helper functions in `src/services/api.js`
 
-### `npm test`
+### Current Local Development Note
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The frontend currently expects backend requests to go to:
 
-### `npm run build`
+- `http://localhost:5000`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+But the root backend server file currently runs on:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- `http://localhost:5010`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Because of that, local development may require one of these fixes:
 
-### `npm run eject`
+1. change the backend port to `5000`, or
+2. update the frontend proxy and API base URL to `5010`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Production API
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+In production, the frontend is configured to use:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- `https://backend.aarna.net.in/api`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Main Frontend Features
 
-## Learn More
+- branded landing page experience
+- animated UI sections
+- responsive layouts
+- contact page
+- about page
+- privacy policy page
+- terms of service page
+- admin panel UI
+- analytics display in admin
+- gallery, services, settings, contacts, and media management through the admin interface
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Libraries Used and Purpose
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- React
+  Used to build reusable UI components and page layouts.
+- React Router DOM
+  Used for frontend navigation and route management.
+- Framer Motion
+  Used for page transitions and motion effects.
+- GSAP
+  Used for more advanced animation control.
+- AOS
+  Used for scroll-triggered animation behavior.
+- Lucide React
+  Used for icons in the frontend UI.
+- ColorThief
+  Used where image-based color extraction is needed.
+- Web Vitals
+  Used for frontend performance reporting support.
 
-### Code Splitting
+## Testing Support
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The frontend includes Testing Library packages for component testing:
 
-### Analyzing the Bundle Size
+- `@testing-library/react`
+- `@testing-library/jest-dom`
+- `@testing-library/user-event`
+- `@testing-library/dom`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Important Notes
 
-### Making a Progressive Web App
+- This frontend uses `HashRouter`, not `BrowserRouter`.
+- The admin route currently exists in the frontend route config.
+- Some page files exist in the codebase without active route wiring and may require future integration if they are meant to be public.
+- The frontend depends on backend JSON-driven content and media responses.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Related Project Files
 
-### Advanced Configuration
+- Main project documentation: [DOCUMENTATION.md](../DOCUMENTATION.md)
+- Root backend: `../backend/`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## GitHub Repository
 
-### Deployment
+- Repository: `https://github.com/infompro9-maker/aarna`
+- Branch: `main`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Last Updated
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Frontend README updated on May 21, 2026
