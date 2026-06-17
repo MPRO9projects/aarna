@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useAnimation, useInView } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import '../styles/About.css';
 import { useServices } from '../hooks/useService';
 import { useSettings } from '../hooks/useSettings';
@@ -9,12 +8,12 @@ import { fetchSiteMedia, resolveMediaUrl } from '../services/api';
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
 
-// UPDATED DELAYS
-const OPEN_DURATION_MS = 2000;      // 2 seconds for cover opening
+// Keep the page-turn sequence intact, but make the initial cover open feel immediate.
+const OPEN_DURATION_MS = 420;       // Faster first cover opening
 const TURN_DURATION_MS = 1600;       // 1.6 seconds for page turns
 const PAGE_PAUSE_MS = 1800;          // 1.8 seconds pause between pages
 const END_PAUSE_MS = 2500;           // 2.5 seconds at end
-const START_DELAY_MS = 800;          // 800ms delay before book starts
+const START_DELAY_MS = 0;            // Start immediately on section entry
 
 const mediaUrl = (val, fallback) => {
   const resolved = resolveMediaUrl(val);
@@ -85,7 +84,7 @@ function useTypingText(text, triggerKey, speed = 42, onComplete, enabled = true)
   return value;
 }
 
-function TypingHeading({
+const TypingHeading = memo(function TypingHeading({
   text,
   triggerKey,
   className = '',
@@ -102,9 +101,9 @@ function TypingHeading({
       {enableTyping && typed.length < text.length ? <span className="typing-cursor">|</span> : null}
     </Tag>
   );
-}
+});
 
-const FloralCorner = ({ className = '' }) => (
+const FloralCorner = memo(({ className = '' }) => (
   <div className={`book-floral ${className}`}>
     <svg
       viewBox="0 0 160 160"
@@ -121,9 +120,9 @@ const FloralCorner = ({ className = '' }) => (
       <circle cx="76" cy="80" r="5" fill="currentColor" opacity=".24" />
     </svg>
   </div>
-);
+));
 
-function RisingTypingText({ text, className = '', isActive = false }) {
+const RisingTypingText = memo(function RisingTypingText({ text, className = '', isActive = false }) {
   const words = text.split(' ');
   return (
     <span aria-label={text} className={`promise-rise-root ${className}`}>
@@ -146,7 +145,7 @@ function RisingTypingText({ text, className = '', isActive = false }) {
       ))}
     </span>
   );
-}
+});
 
 export default function About() {
   useScrollReveal();
@@ -155,6 +154,8 @@ export default function About() {
     description:
       'Discover Aarna, a luxury wedding destination near Mysore offering elegant venues, curated services, and memorable celebrations.',
     routePath: '/about',
+    image: 'https://aarna.net.in/images/about-hero.jpg',
+    imageAlt: 'About Aarna luxury wedding destination near Mysore',
   });
 
   const introRef = useRef(null);
@@ -162,31 +163,40 @@ export default function About() {
   const servicesBookRef = useRef(null);
   const visionMissionRef = useRef(null);
   const promiseRef = useRef(null);
-  const [activeReadableService, setActiveReadableService] = useState(0);
-  const [serviceSlideIndex, setServiceSlideIndex] = useState(0);
-  const serviceAutoRef = useRef(null);
   const [useCompactBookExperience, setUseCompactBookExperience] = useState(false);
   const [siteMedia, setSiteMedia] = useState({});
 
   // Get dynamic settings and services
-  const { settings, loading: settingsLoading } = useSettings();
-  const { services: adminServices, loading: servicesLoading } = useServices();
+  const { settings } = useSettings();
+  const { services: adminServices } = useServices();
 
   useEffect(() => {
-    fetchSiteMedia().then(setSiteMedia).catch(() => {});
+    let mounted = true;
+
+    fetchSiteMedia()
+      .then((media) => {
+        if (mounted) {
+          setSiteMedia(media);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const heroImage = mediaUrl(
     siteMedia.aboutHeroImage,
-    settings?.heroImage || '/about-hero.jpg'
+    settings?.heroImage || '/images/about-hero.jpg'
   );
   const aboutIntroMainImage = mediaUrl(
     siteMedia.aboutIntroMainImage,
-    settings?.aboutImage || '/first.png'
+    settings?.aboutImage || '/images/first.png'
   );
   const aboutIntroFloatImage = mediaUrl(
     siteMedia.aboutIntroFloatImage,
-    '/second.png'
+    '/images/second.png'
   );
   const aboutPromiseImage = mediaUrl(
     siteMedia.aboutPromiseImage,
@@ -235,7 +245,7 @@ export default function About() {
         subtitle: 'Elegant spaces for every celebration',
         description:
           'Gracefully arranged venue settings designed for weddings, receptions, and intimate celebrations with a refined premium feel.',
-        image: '/all_services.png',
+        image: '/images/all_services.png',
         alt: 'Elegant wedding venue arrangement',
       },
       {
@@ -244,7 +254,7 @@ export default function About() {
         subtitle: 'Tasteful menus with refined presentation',
         description:
           'Curated dining experiences with beautiful presentation, warm hospitality, and flavours your guests will remember.',
-        image: '/venue_arrangement.png',
+        image: '/images/venue_arrangement.png',
         alt: 'Wedding catering presentation',
       },
       {
@@ -253,7 +263,7 @@ export default function About() {
         subtitle: 'Styled around your dream theme',
         description:
           'From floral styling to stage design, every décor detail is tailored to feel graceful, personal, and picture-perfect.',
-        image: '/catering.png',
+        image: '/images/catering.png',
         alt: 'Wedding décor styling',
       },
       {
@@ -262,7 +272,7 @@ export default function About() {
         subtitle: 'Beautiful ambiance with seamless execution',
         description:
           'Professional lighting and sound arrangements that make every ritual, entry, and celebration feel polished and grand.',
-        image: '/wedding_decor.png',
+        image: '/images/wedding_decor.png',
         alt: 'Wedding lighting ambiance',
       },
       {
@@ -271,7 +281,7 @@ export default function About() {
         subtitle: 'Smooth coordination from start to finish',
         description:
           'Thoughtful planning and careful coordination so each moment flows beautifully and your day feels effortless.',
-        image: '/lighting_sound.png',
+        image: '/images/lighting_sound.png',
         alt: 'Wedding event planning',
       },
       {
@@ -280,7 +290,7 @@ export default function About() {
         subtitle: 'Luxury stays for guests and family',
         description:
           'Elegantly designed rooms with modern amenities. Complimentary breakfast included. Book independently without any event requirement. Comfortable accommodation for your loved ones.',
-        image: '/event_planning.png',
+        image: '/images/event_planning.png',
         alt: 'Luxury room booking',
       },
     ],
@@ -289,46 +299,6 @@ export default function About() {
 
   // Use admin services if available, otherwise use static fallback
   const servicesData = adminServices.length > 0 ? adminServices : staticServicesData;
-
-  const totalSlides = servicesData.length;
-
-  const startServiceAutoPlay = () => {
-    clearInterval(serviceAutoRef.current);
-    serviceAutoRef.current = setInterval(() => {
-      setServiceSlideIndex((prev) => (prev + 1) % totalSlides);
-    }, 5200);
-  };
-
-  const stopServiceAutoPlay = () => {
-    clearInterval(serviceAutoRef.current);
-  };
-
-  useEffect(() => {
-    startServiceAutoPlay();
-    return () => clearInterval(serviceAutoRef.current);
-  }, [totalSlides]);
-
-  const nextSlide = () => {
-    stopServiceAutoPlay();
-    setServiceSlideIndex((prev) => (prev + 1) % totalSlides);
-  };
-
-  const prevSlide = () => {
-    stopServiceAutoPlay();
-    setServiceSlideIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
-
-  const handleReadablePrev = () => {
-    setActiveReadableService((prev) =>
-      prev === 0 ? servicesData.length - 1 : prev - 1
-    );
-  };
-
-  const handleReadableNext = () => {
-    setActiveReadableService((prev) =>
-      prev === servicesData.length - 1 ? 0 : prev + 1
-    );
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -446,26 +416,16 @@ export default function About() {
     },
   };
 
-  const getOpenOffset = () => {
-    if (typeof window === 'undefined') return 0;
-    const w = window.innerWidth;
-    if (w <= 380) return 70;
-    if (w <= 520) return 84;
-    if (w <= 768) return 110;
-    if (w <= 1024) return 150;
-    return 210;
-  };
-
   const serviceBookPages = useMemo(
     () => {
       const bookImages = [
-        '/our_signature_services.png',
-        '/all_services.png',
-        '/venue_arrangement.png',
-        '/catering.png',
-        '/wedding_decor.png',
-        '/lighting_sound.png',
-        '/event_planning.png',
+        '/images/our_signature_services.png',
+        '/images/all_services.png',
+        '/images/venue_arrangement.png',
+        '/images/catering.png',
+        '/images/wedding_decor.png',
+        '/images/lighting_sound.png',
+        '/images/event_planning.png',
       ];
       return [
         { id: 'cover', kind: 'cover' },
@@ -488,7 +448,6 @@ export default function About() {
   const [activeBookStep, setActiveBookStep] = useState(0);
   const [isBookAnimating, setIsBookAnimating] = useState(false);
   const isAnimatingRef = useRef(false);
-  const [hasStartedBookSequence, setHasStartedBookSequence] = useState(false);
   const [bookLoopKey, setBookLoopKey] = useState(0);
   const [bookVisualOffset, setBookVisualOffset] = useState(0);
   const [shouldResetBook, setShouldResetBook] = useState(false);
@@ -499,7 +458,6 @@ export default function About() {
   const interactTimeoutRef = useRef(null);
   const typedBookHeadingsRef = useRef(new Set());
   const sequenceCompletedRef = useRef(false);
-  const observerRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined;
@@ -532,8 +490,7 @@ export default function About() {
     activeBookStepRef.current = activeBookStep;
   }, [activeBookStep]);
 
-  const updateBookVisualOffset = (step) => {
-    const lastIndex = serviceBookPages.length - 1;
+  const updateBookVisualOffset = useCallback((step) => {
     if (step <= 0) {
       setBookVisualOffset(0);
     } else if (step >= serviceBookPages.length) {
@@ -541,23 +498,30 @@ export default function About() {
     } else {
       setBookVisualOffset(50);
     }
-  };
+  }, [serviceBookPages.length]);
 
   useEffect(() => {
     const onResize = () => {
       updateBookVisualOffset(activeBookStepRef.current);
     };
 
-    window.addEventListener('resize', onResize);
+    window.addEventListener('resize', onResize, { passive: true });
     return () => window.removeEventListener('resize', onResize);
-  }, [serviceBookPages.length]);
+  }, [updateBookVisualOffset]);
 
-  const clearServiceBookTimeouts = () => {
+  const clearBookInteractionTimeout = useCallback(() => {
+    if (interactTimeoutRef.current) {
+      window.clearTimeout(interactTimeoutRef.current);
+      interactTimeoutRef.current = null;
+    }
+  }, []);
+
+  const clearServiceBookTimeouts = useCallback(() => {
     serviceBookTimeoutsRef.current.forEach((id) => window.clearTimeout(id));
     serviceBookTimeoutsRef.current = [];
-  };
+  }, []);
 
-  const applyBookStepInstant = (targetIndex) => {
+  const applyBookStepInstant = useCallback((targetIndex) => {
     const clampedTarget = Math.max(0, Math.min(targetIndex, serviceBookPages.length - 1));
     setServiceBookRotations(
       serviceBookPages.map((_, index) => (index < clampedTarget ? -180 : 0))
@@ -565,15 +529,16 @@ export default function About() {
     setActiveBookStep(clampedTarget);
     activeBookStepRef.current = clampedTarget;
     updateBookVisualOffset(clampedTarget);
-  };
+  }, [serviceBookPages, updateBookVisualOffset]);
 
-  const waitForBook = (ms) =>
+  const waitForBook = useCallback((ms) =>
     new Promise((resolve) => {
       const id = window.setTimeout(resolve, ms);
       serviceBookTimeoutsRef.current.push(id);
-    });
+    }), []);
 
-  const resetBook = () => {
+  const resetBook = useCallback(() => {
+    clearBookInteractionTimeout();
     clearServiceBookTimeouts();
     serviceBookAbortRef.current = false;
     applyBookStepInstant(0);
@@ -581,9 +546,9 @@ export default function About() {
     isAnimatingRef.current = false;
     sequenceCompletedRef.current = false;
     typedBookHeadingsRef.current.clear();
-  };
+  }, [applyBookStepInstant, clearBookInteractionTimeout, clearServiceBookTimeouts]);
 
-  const setPageRotation = (index, value) => {
+  const setPageRotation = useCallback((index, value) => {
     setServiceBookRotations((prev) => {
       const next = [...prev];
       next[index] = value;
@@ -601,9 +566,9 @@ export default function About() {
       activeBookStepRef.current = nextStep;
       updateBookVisualOffset(nextStep);
     }
-  };
+  }, [updateBookVisualOffset]);
 
-  const goToBookStep = async (targetIndex) => {
+  const goToBookStep = useCallback(async (targetIndex) => {
     if (targetIndex < 0 || targetIndex > serviceBookPages.length) return;
     if (isAnimatingRef.current) return;
 
@@ -645,9 +610,9 @@ export default function About() {
       setIsBookAnimating(false);
       isAnimatingRef.current = false;
     }
-  };
+  }, [serviceBookPages.length, setPageRotation, waitForBook]);
 
-  const runBookSequence = async () => {
+  const runBookSequence = useCallback(async () => {
     if (sequenceCompletedRef.current && !shouldResetBook) return;
 
     sequenceCompletedRef.current = false;
@@ -668,11 +633,12 @@ export default function About() {
 
     sequenceCompletedRef.current = true;
     setShouldResetBook(false);
-  };
+  }, [goToBookStep, serviceBookPages.length, shouldResetBook, waitForBook]);
 
   useEffect(() => {
     if (!servicesBookInView) {
       serviceBookAbortRef.current = true;
+      clearBookInteractionTimeout();
       clearServiceBookTimeouts();
       setIsBookAnimating(false);
       isAnimatingRef.current = false;
@@ -693,7 +659,7 @@ export default function About() {
       if (!mounted || !servicesBookInView) return;
 
       resetBook();
-      await waitForBook(100);
+      await waitForBook(0);
       await runBookSequence();
     };
 
@@ -702,20 +668,23 @@ export default function About() {
     return () => {
       mounted = false;
       serviceBookAbortRef.current = true;
+      clearBookInteractionTimeout();
       clearServiceBookTimeouts();
     };
-  }, [servicesBookInView, bookLoopKey, useCompactBookExperience]);
+  }, [bookLoopKey, clearBookInteractionTimeout, clearServiceBookTimeouts, resetBook, runBookSequence, servicesBookInView, useCompactBookExperience, waitForBook]);
 
   useEffect(() => {
     return () => {
       serviceBookAbortRef.current = true;
+      clearBookInteractionTimeout();
       clearServiceBookTimeouts();
     };
-  }, []);
+  }, [clearBookInteractionTimeout, clearServiceBookTimeouts]);
 
-  const stopAutoAndRun = async (targetIndex) => {
+  const stopAutoAndRun = useCallback(async (targetIndex) => {
     if (useCompactBookExperience) {
       serviceBookAbortRef.current = true;
+      clearBookInteractionTimeout();
       clearServiceBookTimeouts();
       setIsBookAnimating(false);
       isAnimatingRef.current = false;
@@ -726,9 +695,7 @@ export default function About() {
     serviceBookAbortRef.current = true;
     clearServiceBookTimeouts();
 
-    if (interactTimeoutRef.current) {
-      clearTimeout(interactTimeoutRef.current);
-    }
+    clearBookInteractionTimeout();
 
     await new Promise((r) => setTimeout(r, 60));
     setIsBookAnimating(false);
@@ -738,11 +705,12 @@ export default function About() {
     await goToBookStep(targetIndex);
 
     if (!serviceBookAbortRef.current) {
-      interactTimeoutRef.current = setTimeout(() => {
+      interactTimeoutRef.current = window.setTimeout(() => {
         setBookLoopKey((prev) => prev + 1);
+        interactTimeoutRef.current = null;
       }, 4000);
     }
-  };
+  }, [applyBookStepInstant, clearBookInteractionTimeout, clearServiceBookTimeouts, goToBookStep, useCompactBookExperience]);
 
   const handlePrevPage = () => {
     stopAutoAndRun(Math.max(activeBookStepRef.current - 1, 0));
@@ -1191,6 +1159,7 @@ export default function About() {
                       style={{
                         zIndex: getDynamicZIndex(index, rotation),
                         transform: `rotateY(${rotation}deg)`,
+                        transitionDuration: index === 0 ? `${OPEN_DURATION_MS}ms` : undefined,
                       }}
                     >
                       <div

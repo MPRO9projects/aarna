@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /api/
+Disallow: /uploads/
+Disallow: /.env
+Disallow: /config/
+Disallow: /backup/
 
 Sitemap: https://aarna.net.in/sitemap.xml

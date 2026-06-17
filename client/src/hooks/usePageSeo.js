@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 const SITE_NAME = 'Aarna Wedding Destination';
 const SITE_URL = 'https://aarna.net.in';
-const DEFAULT_IMAGE = `${SITE_URL}/logo512.png`;
+const DEFAULT_IMAGE = `${SITE_URL}/images/logo512.png`;
 
 const upsertMeta = (selector, attributes) => {
   let element = document.head.querySelector(selector);
@@ -36,10 +36,10 @@ const upsertLink = (selector, attributes) => {
 
 const getPublicUrl = (routePath) => {
   if (!routePath || routePath === '/') {
-    return `${SITE_URL}/#/`;
+    return `${SITE_URL}/`;
   }
 
-  return `${SITE_URL}/#${routePath}`;
+  return `${SITE_URL}${routePath}`;
 };
 
 export function usePageSeo({

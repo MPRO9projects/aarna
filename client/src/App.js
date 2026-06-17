@@ -1,5 +1,5 @@
-import React, { lazy, Suspense, useState, useEffect } from "react";
-import { HashRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import React, { lazy, Suspense, useState, useEffect, useRef } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Phone } from "lucide-react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -9,16 +9,18 @@ import { trackVisit } from './services/api';
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Gallery = lazy(() => import("./pages/Gallery"));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const AdminPanel = lazy(() => import('./pages/Admin/AdminPanel'));
 
-const PAGE_NAMES = { '/': 'Home', '/about': 'About', '/contact': 'Contact', '/privacy-policy': 'Privacy Policy', '/terms-of-service': 'Terms of Service' };
+const PAGE_NAMES = { '/': 'Home', '/about': 'About', '/contact': 'Contact', '/gallery': 'Gallery', '/privacy-policy': 'Privacy Policy', '/terms-of-service': 'Terms of Service' };
 
 function AppContent() {
   const [showRealLogo, setShowRealLogo] = useState(true);
   const [hideCallButton, setHideCallButton] = useState(false);
   const location = useLocation();
+  const restoreScrollTimerRef = useRef(null);
 
   // Hide admin panel from showing header/footer
   const isAdminPage = location.pathname === "/admin";
@@ -48,10 +50,17 @@ function AppContent() {
   useEffect(() => {
     const savedScroll = sessionStorage.getItem(`scroll_${location.pathname}`);
     if (savedScroll) {
-      setTimeout(() => {
+      restoreScrollTimerRef.current = window.setTimeout(() => {
         window.scrollTo(0, parseInt(savedScroll));
       }, 100);
     }
+
+    return () => {
+      if (restoreScrollTimerRef.current) {
+        window.clearTimeout(restoreScrollTimerRef.current);
+        restoreScrollTimerRef.current = null;
+      }
+    };
   }, [location.pathname]);
 
   useEffect(() => {
@@ -114,6 +123,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
         </Routes>

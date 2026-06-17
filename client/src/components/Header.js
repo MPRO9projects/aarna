@@ -1,8 +1,8 @@
-import React, { useEffect, useState, forwardRef } from "react";
+import React, { useEffect, useState, forwardRef, memo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Header.css";
 
-const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
+const Header = memo(forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -19,7 +19,7 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
       });
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
     return () => {
@@ -59,7 +59,7 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
           <Link to="/" className="brand-link" aria-label="Aarna Home">
             <img
               ref={ref}
-              src="/logo.png"
+              src="/images/logo.png"
               alt="Aarna Resort"
               width="180"
               height="72"
@@ -166,7 +166,7 @@ const Header = forwardRef(({ showRealLogo = true, onLogoClick }, ref) => {
       </div>
     </>
   );
-});
+}));
 
 Header.displayName = "Header";
 export default Header;

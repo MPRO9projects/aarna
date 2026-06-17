@@ -1,9 +1,9 @@
-import React from "react";
+import React, { memo } from "react";
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
 import "./Footer.css";
 
-function Footer() {
+const Footer = memo(function Footer() {
   const currentYear = 2026;
 
   return (
@@ -13,9 +13,11 @@ function Footer() {
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
               <img
-                src="/logo.png"
+                src="/images/logo.png"
                 alt="Aarna Resort"
                 className="footer-logo-image"
+                loading="lazy"
+                decoding="async"
               />
             </Link>
 
@@ -54,7 +56,7 @@ function Footer() {
                 <Phone size={18} strokeWidth={2} aria-hidden="true" />
               </a>
               <a
-                href="mailto:aarnadestinations@gmail.com"
+                href="mailto:destinations@aarna.net.in"
                 aria-label="Email Us"
               >
                 <Mail size={18} strokeWidth={2} aria-hidden="true" />
@@ -123,8 +125,8 @@ function Footer() {
 
               <div className="contact-item">
                 <Mail size={16} strokeWidth={2} aria-hidden="true" />
-                <a href="mailto:aarnadestinations@gmail.com">
-                  aarnadestinations@gmail.com
+                <a href="mailto:destinations@aarna.net.in">
+                  destinations@aarna.net.in
                 </a>
               </div>
             </div>
@@ -159,6 +161,6 @@ function Footer() {
       </div>
     </footer>
   );
-}
+});
 
 export default Footer;

@@ -11,7 +11,7 @@ import {
   Plane,
   LoaderCircle,
 } from 'lucide-react';
-import { motion, useAnimation, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 import '../styles/Contact.css';
 import { useSettings } from '../hooks/useSettings';
 import { fetchSiteMedia, resolveMediaUrl, submitContact } from '../services/api';
@@ -50,11 +50,15 @@ function useScrollReveal() {
 }
 
 function Contact() {
+  const defaultContactHeroImage = '/images/contact-hero.png';
+
   usePageSeo({
     title: 'Contact Aarna',
     description:
       'Get in touch with Aarna for weddings, receptions, stays, and event planning near Mysore. Enquire about availability, bookings, and venue details.',
     routePath: '/contact',
+    image: 'https://aarna.net.in/images/contact-hero.png',
+    imageAlt: 'Contact Aarna for weddings, stays, and event bookings near Mysore',
   });
 
   const [formData, setFormData] = useState({
@@ -75,55 +79,24 @@ function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [siteMedia, setSiteMedia] = useState({});
 
   // Get dynamic settings
-  const { settings, loading: settingsLoading } = useSettings();
+  const { settings } = useSettings();
 
   useEffect(() => {
     fetchSiteMedia().then(setSiteMedia).catch(() => {});
   }, []);
 
-  // Refs for sections
   const contactContentRef = useRef(null);
   const mapRef = useRef(null);
   const ctaRef = useRef(null);
 
   useScrollReveal();
 
-  // Animated section controls
-  const contactContentInView = useInView(contactContentRef, { once: true, amount: 0.25 });
-  const mapInView = useInView(mapRef, { once: true, amount: 0.3 });
-  const ctaInView = useInView(ctaRef, { once: true, amount: 0.4 });
-
-  const contactContentControls = useAnimation();
-  const mapControls = useAnimation();
-  const ctaControls = useAnimation();
-
-  // Trigger animations when sections come into view
-  useEffect(() => {
-    if (contactContentInView) {
-      contactContentControls.start('visible');
-    } else {
-      contactContentControls.start('hidden');
-    }
-  }, [contactContentInView, contactContentControls]);
-
-  useEffect(() => {
-    if (mapInView) {
-      mapControls.start('visible');
-    } else {
-      mapControls.start('hidden');
-    }
-  }, [mapInView, mapControls]);
-
-  useEffect(() => {
-    if (ctaInView) {
-      ctaControls.start('visible');
-    } else {
-      ctaControls.start('hidden');
-    }
-  }, [ctaInView, ctaControls]);
+  const VIEWPORT_ONCE = { once: true, amount: 0.15 };
 
   // Animation variants
   const fadeUpVariants = {
@@ -182,15 +155,89 @@ function Contact() {
     }
   };
 
+  const validate = (data) => {
+    const errors = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!data.name.trim()) {
+      errors.name = 'Full name is required.';
+    } else if (data.name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters.';
+    }
+
+    if (!data.email.trim()) {
+      errors.email = 'Email address is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) {
+      errors.email = 'Please enter a valid email address.';
+    }
+
+    if (!data.phone.trim()) {
+      errors.phone = 'Phone number is required.';
+    } else if (!/^(\+91[\s-]?)?[6-9]\d{9}$/.test(data.phone.trim().replace(/\s/g, ''))) {
+      errors.phone = 'Please enter a valid 10-digit Indian mobile number.';
+    }
+
+    if (data.eventType !== 'book-your-stay') {
+      if (data.eventDate) {
+        const eventDate = new Date(data.eventDate);
+        if (eventDate < today) errors.eventDate = 'Event date must be today or in the future.';
+      }
+      if (data.guestCount && Number(data.guestCount) < 1) {
+        errors.guestCount = 'Guest count must be at least 1.';
+      }
+    }
+
+    if (data.eventType === 'book-your-stay') {
+      if (!data.checkIn) {
+        errors.checkIn = 'Check-in date is required.';
+      } else {
+        const checkIn = new Date(data.checkIn);
+        if (checkIn < today) errors.checkIn = 'Check-in date must be today or in the future.';
+      }
+
+      if (!data.checkOut) {
+        errors.checkOut = 'Check-out date is required.';
+      } else if (data.checkIn) {
+        const checkIn = new Date(data.checkIn);
+        const checkOut = new Date(data.checkOut);
+        if (checkOut <= checkIn) errors.checkOut = 'Check-out date must be after check-in date.';
+      }
+
+      if (!data.adults || Number(data.adults) < 1) {
+        errors.adults = 'At least 1 adult is required.';
+      }
+    }
+
+    return errors;
+  };
+
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (touched[name]) {
+      setFormErrors((prev) => {
+        const updated = validate({ ...formData, [name]: value });
+        return { ...prev, [name]: updated[name] };
+      });
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const errors = validate(formData);
+    setFormErrors((prev) => ({ ...prev, [name]: errors[name] }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const allTouched = Object.keys(formData).reduce((acc, k) => ({ ...acc, [k]: true }), {});
+    setTouched(allTouched);
+    const errors = validate(formData);
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     setIsSubmitting(true);
     setSubmitError('');
 
@@ -212,6 +259,8 @@ function Contact() {
           children: '',
           stayQuery: '',
         });
+        setFormErrors({});
+        setTouched({});
 
         setTimeout(() => {
           setSubmitted(false);
@@ -257,7 +306,9 @@ function Contact() {
       {/* Hero Section */}
       <motion.section
         className="contact-hero"
-        style={{ backgroundImage: `url('${mediaUrl(siteMedia.contactHeroImage, '/contact.png')}')` }}
+        style={{
+          backgroundImage: `url('${mediaUrl(siteMedia.contactHeroImage, defaultContactHeroImage)}'), url('${defaultContactHeroImage}')`,
+        }}
         initial={{ opacity: 0, scale: 1.05 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_OUT }}
@@ -278,7 +329,8 @@ function Contact() {
         className="contact-content-section deferred-section"
         variants={fadeUpVariants}
         initial="hidden"
-        animate={contactContentControls}
+        whileInView="visible"
+        viewport={VIEWPORT_ONCE}
       >
         <div className="container">
           <div className="contact-grid">
@@ -287,7 +339,7 @@ function Contact() {
               className="contact-details-col"
               variants={slideLeftVariants}
               initial="hidden"
-              animate={contactContentControls}
+              animate="visible"
             >
               <div className="details-card">
                 <div className="kicker">GET IN TOUCH</div>
@@ -305,7 +357,7 @@ function Contact() {
                   className="info-list"
                   variants={staggerContainer}
                   initial="hidden"
-                  animate={contactContentControls}
+                  animate="visible"
                 >
                   <motion.div className="info-item" variants={staggerItem}>
                     <div className="info-icon">
@@ -337,8 +389,8 @@ function Contact() {
                     <div className="info-text">
                       <h3>Email Us</h3>
                       <p>
-                        <a href={`mailto:${settings?.email || 'aarnadestinations@gmail.com'}`}>
-                          {settings?.email || 'aarnadestinations@gmail.com'}
+                        <a href={`mailto:${settings?.email || 'destinations@aarna.net.in'}`}>
+                          {settings?.email || 'destinations@aarna.net.in'}
                         </a>
                       </p>
                     </div>
@@ -359,7 +411,7 @@ function Contact() {
                   className="contact-socials"
                   variants={fadeUpVariants}
                   initial="hidden"
-                  animate={contactContentControls}
+                  animate="visible"
                 >
                   <span className="social-label">Follow Us</span>
                   <div className="social-icons">
@@ -402,7 +454,7 @@ function Contact() {
                       <Phone size={18} strokeWidth={2} aria-hidden="true" />
                     </a>
                     <a
-                      href={`mailto:${settings?.email || 'aarnadestinations@gmail.com'}`}
+                      href={`mailto:${settings?.email || 'destinations@aarna.net.in'}`}
                       aria-label="Email Us"
                     >
                       <Mail size={18} strokeWidth={2} aria-hidden="true" />
@@ -417,7 +469,7 @@ function Contact() {
               className="contact-form-col"
               variants={slideRightVariants}
               initial="hidden"
-              animate={contactContentControls}
+              animate="visible"
             >
               <div className="form-card">
                 {submitted ? (
@@ -473,7 +525,7 @@ function Contact() {
                       className="wedding-form"
                       variants={staggerContainer}
                       initial="hidden"
-                      animate={contactContentControls}
+                      animate="visible"
                     >
                       <motion.div className="form-row" variants={staggerItem}>
                         <div className="form-group">
@@ -484,9 +536,11 @@ function Contact() {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             placeholder="Enter your full name"
-                            required
+                            className={formErrors.name ? 'input-error' : ''}
                           />
+                          {formErrors.name && <span className="field-error">{formErrors.name}</span>}
                         </div>
 
                         <div className="form-group">
@@ -497,9 +551,11 @@ function Contact() {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             placeholder="Enter your email address"
-                            required
+                            className={formErrors.email ? 'input-error' : ''}
                           />
+                          {formErrors.email && <span className="field-error">{formErrors.email}</span>}
                         </div>
                       </motion.div>
 
@@ -512,9 +568,11 @@ function Contact() {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            placeholder="Enter your phone number"
-                            required
+                            onBlur={handleBlur}
+                            placeholder="Enter your 10-digit mobile number"
+                            className={formErrors.phone ? 'input-error' : ''}
                           />
+                          {formErrors.phone && <span className="field-error">{formErrors.phone}</span>}
                         </div>
 
                         <div className="form-group">
@@ -547,7 +605,10 @@ function Contact() {
                               name="eventDate"
                               value={formData.eventDate}
                               onChange={handleChange}
+                              onBlur={handleBlur}
+                              className={formErrors.eventDate ? 'input-error' : ''}
                             />
+                            {formErrors.eventDate && <span className="field-error">{formErrors.eventDate}</span>}
                           </div>
 
                           <div className="form-group">
@@ -558,9 +619,12 @@ function Contact() {
                               name="guestCount"
                               value={formData.guestCount}
                               onChange={handleChange}
+                              onBlur={handleBlur}
                               placeholder="Enter expected guests"
-                              min="0"
+                              min="1"
+                              className={formErrors.guestCount ? 'input-error' : ''}
                             />
+                            {formErrors.guestCount && <span className="field-error">{formErrors.guestCount}</span>}
                           </div>
                         </motion.div>
                       )}
@@ -569,42 +633,48 @@ function Contact() {
                         <>
                           <motion.div className="form-row stay-dates-row" variants={staggerItem}>
                             <div className="form-group">
-                              <label htmlFor="checkIn">Check-In Date</label>
+                              <label htmlFor="checkIn">Check-In Date *</label>
                               <input
                                 id="checkIn"
                                 type="date"
                                 name="checkIn"
                                 value={formData.checkIn}
                                 onChange={handleChange}
-                                required
+                                onBlur={handleBlur}
+                                className={formErrors.checkIn ? 'input-error' : ''}
                               />
+                              {formErrors.checkIn && <span className="field-error">{formErrors.checkIn}</span>}
                             </div>
                             <div className="form-group">
-                              <label htmlFor="checkOut">Check-Out Date</label>
+                              <label htmlFor="checkOut">Check-Out Date *</label>
                               <input
                                 id="checkOut"
                                 type="date"
                                 name="checkOut"
                                 value={formData.checkOut}
                                 onChange={handleChange}
-                                required
+                                onBlur={handleBlur}
+                                className={formErrors.checkOut ? 'input-error' : ''}
                               />
+                              {formErrors.checkOut && <span className="field-error">{formErrors.checkOut}</span>}
                             </div>
                           </motion.div>
 
                           <motion.div className="form-row" variants={staggerItem}>
                             <div className="form-group">
-                              <label htmlFor="adults">Number of Adults</label>
+                              <label htmlFor="adults">Number of Adults *</label>
                               <input
                                 id="adults"
                                 type="number"
                                 name="adults"
                                 value={formData.adults}
                                 onChange={handleChange}
+                                onBlur={handleBlur}
                                 placeholder="Enter number of adults"
                                 min="1"
-                                required
+                                className={formErrors.adults ? 'input-error' : ''}
                               />
+                              {formErrors.adults && <span className="field-error">{formErrors.adults}</span>}
                             </div>
                             <div className="form-group">
                               <label htmlFor="children">Number of Children</label>
@@ -685,7 +755,8 @@ function Contact() {
         className="map-section deferred-section"
         variants={zoomInVariants}
         initial="hidden"
-        animate={mapControls}
+        whileInView="visible"
+        viewport={VIEWPORT_ONCE}
       >
         <div className="container">
           <div className="map-container" data-reveal>
@@ -708,7 +779,8 @@ function Contact() {
         className="wedding-cta deferred-section"
         variants={fadeUpVariants}
         initial="hidden"
-        animate={ctaControls}
+        whileInView="visible"
+        viewport={VIEWPORT_ONCE}
       >
         <div className="container">
           <div className="cta-simple" data-reveal>

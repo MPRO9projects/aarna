@@ -1,4 +1,5 @@
 import React, {
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -26,11 +27,62 @@ const EASE_OUT = [0.22, 1, 0.36, 1];
 const EASE_SMOOTH = [0.25, 0.46, 0.45, 0.94];
 const EASE_GENTLE = [0.33, 0.66, 0.66, 1];
 const INTRO_FAILSAFE_MS = 9000;
+const ZERO_MOUSE_POSITION = { x: 0, y: 0 };
+const EVENTS_AND_STAY_EVENT_TYPES = [
+  'Weddings',
+  'Receptions',
+  'Engagements',
+  'Mehendi & Sangeet',
+  'Birthday Celebrations',
+  'Anniversary Celebrations',
+];
+const EVENTS_AND_STAY_FEATURES = [
+  'Luxury rooms for families and guests',
+  'Comfortable accommodation with warm hospitality',
+  'Complimentary breakfast included',
+  'Independent stay bookings available',
+];
+const EVENTS_AND_STAY_TEXT_REVEAL = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      delay: 0.12 + i * 0.08,
+      ease: EASE_OUT,
+    },
+  }),
+};
+const EVENTS_AND_STAY_LINE_REVEAL_LEFT = {
+  hidden: { opacity: 0, x: -18 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.55,
+      delay: 0.28 + i * 0.08,
+      ease: EASE_OUT,
+    },
+  }),
+};
+const EVENTS_AND_STAY_LINE_REVEAL_RIGHT = {
+  hidden: { opacity: 0, x: 18 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.55,
+      delay: 0.28 + i * 0.08,
+      ease: EASE_OUT,
+    },
+  }),
+};
 
 /* ═══════════════════════════════════════════════════════════
    AnimatedTitle
    ═══════════════════════════════════════════════════════════ */
-function AnimatedTitle({ text, delay = 0, className = '' }) {
+const AnimatedTitle = memo(function AnimatedTitle({ text, delay = 0, className = '' }) {
   const words = text.split(' ');
   return (
     <span aria-label={text} className={`animated-title-root ${className}`}>
@@ -52,12 +104,12 @@ function AnimatedTitle({ text, delay = 0, className = '' }) {
       ))}
     </span>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════
    OverlayHero - Transparent Background (Photo Shows Through)
    ═══════════════════════════════════════════════════════════ */
-function CardTitle({ text, isActive, triggerKey }) {
+const CardTitle = memo(function CardTitle({ text, isActive, triggerKey }) {
   const words = (text || '').split(' ');
 
   if (!isActive) {
@@ -85,11 +137,13 @@ function CardTitle({ text, isActive, triggerKey }) {
       ))}
     </h3>
   );
-}
+});
 
-function OverlayHero({ space, containerRef, sharedImageRef, onBack, onExplore }) {
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+const OverlayHero = memo(function OverlayHero({ space, containerRef, sharedImageRef, onBack, onExplore }) {
+  const [mouse, setMouse] = useState(ZERO_MOUSE_POSITION);
   const heroRef = useRef(null);
+  const mouseFrameRef = useRef(null);
+  const mouseTargetRef = useRef(ZERO_MOUSE_POSITION);
 
   const { scrollYProgress } = useScroll({
     container: containerRef,
@@ -109,11 +163,43 @@ function OverlayHero({ space, containerRef, sharedImageRef, onBack, onExplore })
 
   const handleMouseMove = (e) => {
     const b = e.currentTarget.getBoundingClientRect();
-    setMouse({
+    mouseTargetRef.current = {
       x: (e.clientX - b.left - b.width / 2) / b.width,
       y: (e.clientY - b.top - b.height / 2) / b.height,
+    };
+
+    if (mouseFrameRef.current !== null) return;
+
+    mouseFrameRef.current = window.requestAnimationFrame(() => {
+      mouseFrameRef.current = null;
+      setMouse((prev) => {
+        const next = mouseTargetRef.current;
+        if (prev.x === next.x && prev.y === next.y) {
+          return prev;
+        }
+        return next;
+      });
     });
   };
+
+  const handleMouseLeave = () => {
+    mouseTargetRef.current = ZERO_MOUSE_POSITION;
+    if (mouseFrameRef.current !== null) {
+      window.cancelAnimationFrame(mouseFrameRef.current);
+      mouseFrameRef.current = null;
+    }
+    setMouse((prev) =>
+      prev.x === ZERO_MOUSE_POSITION.x && prev.y === ZERO_MOUSE_POSITION.y
+        ? prev
+        : ZERO_MOUSE_POSITION
+    );
+  };
+
+  useEffect(() => () => {
+    if (mouseFrameRef.current !== null) {
+      window.cancelAnimationFrame(mouseFrameRef.current);
+    }
+  }, []);
 
   return (
     <motion.section
@@ -124,7 +210,7 @@ function OverlayHero({ space, containerRef, sharedImageRef, onBack, onExplore })
       transition={{ duration: 0.6, ease: EASE_OUT }}
       className="overlay-hero-section"
       onMouseMove={handleMouseMove}
-      onMouseLeave={() => setMouse({ x: 0, y: 0 })}
+      onMouseLeave={handleMouseLeave}
     >
       <motion.button
         type="button"
@@ -282,12 +368,12 @@ function OverlayHero({ space, containerRef, sharedImageRef, onBack, onExplore })
       </motion.div>
     </motion.section>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════
    OverlayContent - Glass Effect (Transparent with blur)
    ═══════════════════════════════════════════════════════════ */
-function OverlayContent({ space, onBack }) {
+const OverlayContent = memo(function OverlayContent({ space, onBack }) {
   return (
     <section className="overlay-content-section">
       <div className="overlay-content-container">
@@ -386,7 +472,7 @@ function OverlayContent({ space, onBack }) {
       </div>
     </section>
   );
-}
+});
 
 const mediaUrl = (val, fallback) => {
   const resolved = resolveMediaUrl(val);
@@ -401,62 +487,7 @@ const getInitialIntroVideo = () => {
   return landscapeVideo;
 };
 
-function EventsAndStaySection({ siteMedia = {} }) {
-  const eventTypes = [
-    'Weddings',
-    'Receptions',
-    'Engagements',
-    'Mehendi & Sangeet',
-    'Birthday Celebrations',
-    'Anniversary Celebrations',
-  ];
-
-  const stayFeatures = [
-    'Luxury rooms for families and guests',
-    'Comfortable accommodation with warm hospitality',
-    'Complimentary breakfast included',
-    'Independent stay bookings available',
-  ];
-
-  const textReveal = {
-    hidden: { opacity: 0, y: 24 },
-    visible: (i = 0) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.7,
-        delay: 0.12 + i * 0.08,
-        ease: EASE_OUT,
-      },
-    }),
-  };
-
-  const lineRevealLeft = {
-    hidden: { opacity: 0, x: -18 },
-    visible: (i = 0) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.55,
-        delay: 0.28 + i * 0.08,
-        ease: EASE_OUT,
-      },
-    }),
-  };
-
-  const lineRevealRight = {
-    hidden: { opacity: 0, x: 18 },
-    visible: (i = 0) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.55,
-        delay: 0.28 + i * 0.08,
-        ease: EASE_OUT,
-      },
-    }),
-  };
-
+const EventsAndStaySection = memo(function EventsAndStaySection({ siteMedia = {} }) {
   return (
     <section className="events-stay-section sample-style-section deferred-section">
       <div className="sample-style-top-wave" />
@@ -528,7 +559,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
 
             <motion.h3
               className="sample-feature-title"
-              variants={textReveal}
+              variants={EVENTS_AND_STAY_TEXT_REVEAL}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: false }}
@@ -539,7 +570,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
 
             <motion.p
               className="sample-feature-intro"
-              variants={textReveal}
+              variants={EVENTS_AND_STAY_TEXT_REVEAL}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: false }}
@@ -552,7 +583,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
 
             <motion.div
               className="sample-quote-box"
-              variants={textReveal}
+              variants={EVENTS_AND_STAY_TEXT_REVEAL}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: false }}
@@ -566,11 +597,11 @@ function EventsAndStaySection({ siteMedia = {} }) {
             </motion.div>
 
             <div className="sample-feature-flow">
-              {eventTypes.map((event, idx) => (
+              {EVENTS_AND_STAY_EVENT_TYPES.map((event, idx) => (
                 <motion.div
                   key={event}
                   className="sample-feature-line"
-                  variants={lineRevealLeft}
+                  variants={EVENTS_AND_STAY_LINE_REVEAL_LEFT}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false }}
@@ -605,7 +636,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
             >
               <div className="image-curtain-shell sample-image-shell">
                 <img
-                  src={mediaUrl(siteMedia.eventMainImage, '/first.png')}
+                  src={mediaUrl(siteMedia.eventMainImage, '/images/first.png')}
                   alt="Elegant celebration setup"
                   className="sample-main-image"
                   loading="lazy"
@@ -631,7 +662,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
               transition={{ duration: 0.8, delay: 0.2, ease: EASE_OUT }}
             >
               <img
-                src={mediaUrl(siteMedia.eventFloatImage, '/second.png')}
+                src={mediaUrl(siteMedia.eventFloatImage, '/images/second.png')}
                 alt="Outdoor celebration"
                 loading="lazy"
                 decoding="async"
@@ -707,7 +738,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
 
             <motion.h3
               className="sample-feature-title"
-              variants={textReveal}
+              variants={EVENTS_AND_STAY_TEXT_REVEAL}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: false }}
@@ -718,7 +749,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
 
             <motion.p
               className="sample-feature-intro"
-              variants={textReveal}
+              variants={EVENTS_AND_STAY_TEXT_REVEAL}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: false }}
@@ -731,7 +762,7 @@ function EventsAndStaySection({ siteMedia = {} }) {
 
             <motion.div
               className="sample-quote-box"
-              variants={textReveal}
+              variants={EVENTS_AND_STAY_TEXT_REVEAL}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: false }}
@@ -745,11 +776,11 @@ function EventsAndStaySection({ siteMedia = {} }) {
             </motion.div>
 
             <div className="sample-feature-flow">
-              {stayFeatures.map((feature, idx) => (
+              {EVENTS_AND_STAY_FEATURES.map((feature, idx) => (
                 <motion.div
                   key={feature}
                   className="sample-feature-line"
-                  variants={lineRevealRight}
+                  variants={EVENTS_AND_STAY_LINE_REVEAL_RIGHT}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false }}
@@ -777,9 +808,9 @@ function EventsAndStaySection({ siteMedia = {} }) {
       </div>
     </section>
   );
-}
+});
 
-function DiscoverMoreAarnaSection() {
+const DiscoverMoreAarnaSection = memo(function DiscoverMoreAarnaSection() {
   return (
     <section className="discover-aarna-section deferred-section">
       <div className="discover-aarna-shell">
@@ -852,17 +883,19 @@ function DiscoverMoreAarnaSection() {
       </div>
     </section>
   );
-}
+});
 
 /* ═══════════════════════════════════════════════════════════
    HOME
    ═══════════════════════════════════════════════════════════ */
 function Home() {
   usePageSeo({
-    title: 'The Perfect Wedding Destination',
+    title: 'Luxury Wedding Destination Near Mysore',
     description:
       'Aarna is a luxury wedding destination near Mysore for elegant weddings, receptions, stays, and memorable celebrations.',
     routePath: '/',
+    image: 'https://aarna.net.in/images/ourspace_grandcelebration_hall.png',
+    imageAlt: 'Aarna grand celebration hall at the wedding destination near Mysore',
   });
 
   const introVideoRef = useRef(null);
@@ -874,6 +907,8 @@ function Home() {
   const slideUpTimerRef = useRef(null);
   const transitionLockTimerRef = useRef(null);
   const overlayOpenTimerRef = useRef(null);
+  const introSequenceTimersRef = useRef([]);
+  const focusActiveCardTimerRef = useRef(null);
   const spacesSectionRef = useRef(null);
   const overlayScrollRef = useRef(null);
   const overlayContentRef = useRef(null);
@@ -883,7 +918,21 @@ function Home() {
   const shouldFocusActiveCardRef = useRef(false);
 
   const [siteMedia, setSiteMedia] = useState({});
-  useEffect(() => { fetchSiteMedia().then(setSiteMedia).catch(() => {}); }, []);
+  useEffect(() => {
+    let mounted = true;
+
+    fetchSiteMedia()
+      .then((media) => {
+        if (mounted) {
+          setSiteMedia(media);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const [introVideoSrc, setIntroVideoSrc] = useState(getInitialIntroVideo);
   const [heroReady, setHeroReady] = useState(false);
@@ -896,11 +945,10 @@ function Home() {
   const [activeSpace, setActiveSpace] = useState(1);
 
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [openedSpace, setOpenedSpace] = useState(null);
   const [closingSpaceId, setClosingSpaceId] = useState(null);
   const [titleAnimationKey, setTitleAnimationKey] = useState(0);
-  const [isOverlayOpening, setIsOverlayOpening] = useState(false);
+  const [, setIsOverlayOpening] = useState(false);
 
   const [hasIntroPlayed, setHasIntroPlayed] = useState(() => {
     return sessionStorage.getItem('introVideoPlayed') === 'true';
@@ -932,7 +980,7 @@ function Home() {
           { label: 'Experience', value: 'Grand Indoor Venue' },
           { label: 'Mood', value: 'Classic Celebration' },
         ],
-        image:'/ourspace_grandcelebration_hall.png',
+        image:'/images/ourspace_grandcelebration_hall.png',
       },
       {
         id: 2,
@@ -954,7 +1002,7 @@ function Home() {
           { label: 'Mood', value: 'Scenic & Festive' },
         ],
         image:
-          '/ourspace_outdoor_lawn.png',
+          '/images/ourspace_outdoor_lawn.png',
       },
       {
         id: 3,
@@ -976,7 +1024,7 @@ function Home() {
           { label: 'Mood', value: 'Warm Hospitality' },
         ],
         image:
-          '/ourspace_dining.png',
+          '/images/ourspace_dining.png',
       },
       {
         id: 4,
@@ -998,7 +1046,7 @@ function Home() {
           { label: 'Mood', value: 'Serene & Spiritual' },
         ],
         image:
-          '/ourspace_kalyani.png',
+          '/images/ourspace_kalyani.png',
       },
       {
         id: 5,
@@ -1020,7 +1068,7 @@ function Home() {
           { label: 'Mood', value: 'Divine & Peaceful' },
         ],
         image:
-          '/ourspace_temple.png',
+          '/images/ourspace_temple.png',
       },
       {
         id: 6,
@@ -1064,7 +1112,7 @@ function Home() {
           { label: 'Mood', value: 'Welcoming & Relaxed' },
         ],
         image:
-          'ourspace_guest_accommodation_room.png',
+          '/images/ourspace_guest_accommodation_room.png',
       },
       {
         id: 8,
@@ -1086,25 +1134,25 @@ function Home() {
           { label: 'Mood', value: 'Organized & Functional' },
         ],
         image:
-          '/ourspace_wellequiped_kitchen.png',
+          '/images/ourspace_wellequiped_kitchen.png',
       },
     ],
     []
   );
 
   // Get admin sections from backend (if any)
-  const { sections: adminSections, loading: sectionsLoading } = useSections();
+  const { sections: adminSections } = useSections();
 
   // Always use backend sections (pre-populated with defaults)
   const localSpaceImages = useMemo(() => [
-    '/ourspace_grandcelebration_hall.png',
-    '/ourspace_outdoor_lawn.png',
-    '/ourspace_dining.png',
-    '/ourspace_kalyani.png',
-    '/ourspace_temple.png',
+    '/images/ourspace_grandcelebration_hall.png',
+    '/images/ourspace_outdoor_lawn.png',
+    '/images/ourspace_dining.png',
+    '/images/ourspace_kalyani.png',
+    '/images/ourspace_temple.png',
     null,
-    '/ourspace_guest_accommodation_room.png',
-    '/ourspace_wellequiped_kitchen.png',
+    '/images/ourspace_guest_accommodation_room.png',
+    '/images/ourspace_wellequiped_kitchen.png',
   ], []);
   const baseSpaces = adminSections.length > 0 ? adminSections : ourSpaces;
   const finalSpaces = useMemo(
@@ -1121,7 +1169,7 @@ function Home() {
       const found = finalSpaces.findIndex((s) => String(s.id) === String(activeSpace));
       if (found === -1) setActiveSpace(finalSpaces[0].id);
     }
-  }, [finalSpaces]);
+  }, [activeSpace, finalSpaces]);
 
   const wrapIndex = useCallback((idx, len) => (idx + len) % len, []);
   const activeIndex = finalSpaces.findIndex((s) => String(s.id) === String(activeSpace));
@@ -1136,6 +1184,18 @@ function Home() {
     [activeIndex, finalSpaces, wrapIndex]
   );
 
+  const scheduleIntroTimer = useCallback((callback, delay) => {
+    const timerId = window.setTimeout(() => {
+      introSequenceTimersRef.current = introSequenceTimersRef.current.filter(
+        (activeId) => activeId !== timerId
+      );
+      callback();
+    }, delay);
+
+    introSequenceTimersRef.current.push(timerId);
+    return timerId;
+  }, []);
+
   const clearTimers = useCallback(() => {
     if (introFallbackTimerRef.current) window.clearTimeout(introFallbackTimerRef.current);
     if (autoTimerRef.current) window.clearInterval(autoTimerRef.current);
@@ -1143,6 +1203,17 @@ function Home() {
     if (progressRafRef.current) window.cancelAnimationFrame(progressRafRef.current);
     if (slideUpTimerRef.current) window.clearTimeout(slideUpTimerRef.current);
     if (overlayOpenTimerRef.current) window.clearTimeout(overlayOpenTimerRef.current);
+    if (focusActiveCardTimerRef.current) window.clearTimeout(focusActiveCardTimerRef.current);
+    introSequenceTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
+
+    introFallbackTimerRef.current = null;
+    autoTimerRef.current = null;
+    progressTimerRef.current = null;
+    progressRafRef.current = null;
+    slideUpTimerRef.current = null;
+    overlayOpenTimerRef.current = null;
+    focusActiveCardTimerRef.current = null;
+    introSequenceTimersRef.current = [];
   }, []);
 
   const triggerCardTransition = useCallback((nextId) => {
@@ -1188,19 +1259,19 @@ function Home() {
   const startAutoPlay = useCallback(() => {
     clearTimers();
     progressValue.set(0);
-    if (isPaused || openedSpace) return;
+    if (openedSpace) return;
     const t0 = performance.now();
     const tick = (now) => {
       const elapsed = now - t0;
       const nextProgress = Math.min((elapsed / autoDuration) * 100, 100);
       progressValue.set(nextProgress);
-      if (nextProgress < 100 && !isPaused && !openedSpace) {
+      if (nextProgress < 100 && !openedSpace) {
         progressRafRef.current = window.requestAnimationFrame(tick);
       }
     };
     progressRafRef.current = window.requestAnimationFrame(tick);
     autoTimerRef.current = window.setInterval(goNext, autoDuration);
-  }, [autoDuration, clearTimers, goNext, isPaused, openedSpace, progressValue]);
+  }, [autoDuration, clearTimers, goNext, openedSpace, progressValue]);
 
   useEffect(() => {
     const preloaded = [];
@@ -1229,13 +1300,13 @@ function Home() {
 
     window.dispatchEvent(new Event('hideRealLogo'));
 
-    setTimeout(() => {
+    scheduleIntroTimer(() => {
       setIsAnimatingToLogo(true);
 
-      setTimeout(() => {
+      scheduleIntroTimer(() => {
         setHeroReady(true);
 
-        setTimeout(() => {
+        scheduleIntroTimer(() => {
           setSplashActive(false);
           window.dispatchEvent(new Event('showRealLogo'));
           setIsAnimatingToLogo(false);
@@ -1243,13 +1314,34 @@ function Home() {
           window.scrollTo({ top: 0, behavior: 'instant' });
         }, 180);
 
-        slideUpTimerRef.current = setTimeout(() => {
+        slideUpTimerRef.current = scheduleIntroTimer(() => {
           setSpacesVisible(true);
           setSpacesSlideUp(true);
         }, 3200);
       }, 1300);
     }, 220);
-  }, []);
+  }, [scheduleIntroTimer]);
+
+  const handleIntroSkip = useCallback(() => {
+    if (introCompletedRef.current) return;
+
+    if (introVideoRef.current) {
+      introVideoRef.current.pause();
+    }
+
+    handleIntroComplete();
+  }, [handleIntroComplete]);
+
+  const handleIntroInteraction = useCallback((event) => {
+    if (introCompletedRef.current) return;
+
+    if ('button' in event && event.button !== 0) return;
+    if (event.type === 'touchend') {
+      event.preventDefault();
+    }
+
+    handleIntroSkip();
+  }, [handleIntroSkip]);
 
   const handleBackToSpaces = useCallback(() => {
     if (!openedSpace) return;
@@ -1276,8 +1368,7 @@ function Home() {
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      const stillOnHome =
-        window.location.hash === '#/' || window.location.hash === '#';
+      const stillOnHome = window.location.pathname === '/';
       if (window.history.state?.modalOpen && stillOnHome) {
         window.history.back();
       }
@@ -1384,7 +1475,7 @@ function Home() {
     if (!spacesVisible) return;
     startAutoPlay();
     return () => clearTimers();
-  }, [activeSpace, spacesVisible, startAutoPlay, clearTimers, isPaused, openedSpace]);
+  }, [activeSpace, spacesVisible, startAutoPlay, clearTimers, openedSpace]);
 
   useEffect(() => {
     if (!openedSpace) return;
@@ -1440,9 +1531,11 @@ function Home() {
                 inset: 0,
                 zIndex: 10000,
                 overflow: 'hidden',
-                pointerEvents: 'none',
+                pointerEvents: 'auto',
                 transformOrigin: 'center center',
               }}
+              onClick={handleIntroInteraction}
+              onTouchEnd={handleIntroInteraction}
             >
               <div className="intro-video-splash" style={{ width: '100%', height: '100%' }}>
                 <video
@@ -1839,7 +1932,11 @@ function Home() {
                 }
 
                 if (shouldFocusActiveCardRef.current) {
-                  window.setTimeout(() => {
+                  if (focusActiveCardTimerRef.current) {
+                    window.clearTimeout(focusActiveCardTimerRef.current);
+                  }
+
+                  focusActiveCardTimerRef.current = window.setTimeout(() => {
                     const activeCard = document.querySelector(
                       '.spaces-cards-row .space-thumb-card.is-center'
                     );

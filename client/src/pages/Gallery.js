@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { usePageSeo } from '../hooks/usePageSeo';
 import '../styles/Gallery.css';
 
 /* ── Custom Hook for Scroll Reveal ────────────────────────── */
@@ -47,19 +48,20 @@ const Gallery = () => {
   const urlCategory = searchParams.get('category') || 'all';
   const [filter, setFilter] = useState(urlCategory);
   
+  usePageSeo({
+    title: 'Wedding Gallery',
+    description: 'Explore our gallery of luxury weddings, receptions, engagements, and celebrations at Aarna Wedding Destination near Mysore, Karnataka.',
+    routePath: '/gallery',
+    image: 'https://aarna.net.in/images/first.png',
+    imageAlt: 'Aarna wedding gallery featuring luxury celebration moments near Mysore',
+  });
+
   // Initialize animations
   useGalleryAnimations();
 
   useEffect(() => {
     setFilter(urlCategory);
   }, [urlCategory]);
-
-  useEffect(() => {
-    // SEO
-    document.title = "Gallery Collections | Aarna Luxury Resort";
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', 'Pure white spaces, refined gold accents, and timeless celebrations at Aarna Resort.');
-  }, []);
 
   const galleryData = [
     /* WEDDING (10) */

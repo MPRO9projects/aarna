@@ -6,7 +6,7 @@ const defaultSettings = {
   siteName: "Aarna",
   phone: "+91 9845122100",
   phoneSecondary: "+91 9880942101",
-  email: "aarnadestinations@gmail.com",
+  email: "destinations@aarna.net.in",
   address: "Gungralchatra, Mysore-571130, Near Bangalore-Kushalnagar NH-275, Mysore, Karnataka, India.",
   openingHours: "Monday to Sunday: 9:00 AM – 9:00 PM",
   social: {

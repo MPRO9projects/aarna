@@ -54,7 +54,7 @@
         "value": "Scenic & Festive"
       }
     ],
-    "image": "/ourspace_outdoor_lawn.png",
+    "image": "/uploads/ea06ce1e-e5e3-4eaa-924e-571f5649c47f.png",
     "createdAt": "2024-01-01T00:00:00.000Z"
   },
   {
@@ -170,7 +170,7 @@
         "value": "Elegant & Calm"
       }
     ],
-    "image": "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80",
+    "image": "/uploads/718d6c8d-d70b-441e-a7c1-3d8e9a8b4909.png",
     "createdAt": "2024-01-01T00:00:00.000Z"
   },
   {
@@ -215,9 +215,18 @@
       "Built for large celebration requirements"
     ],
     "stats": [
-      { "label": "Best For", "value": "Catering Support" },
-      { "label": "Experience", "value": "Operational Efficiency" },
-      { "label": "Mood", "value": "Organized & Functional" }
+      {
+        "label": "Best For",
+        "value": "Catering Support"
+      },
+      {
+        "label": "Experience",
+        "value": "Operational Efficiency"
+      },
+      {
+        "label": "Mood",
+        "value": "Organized & Functional"
+      }
     ],
     "image": "/ourspace_wellequiped_kitchen.png",
     "createdAt": "2024-01-01T00:00:00.000Z"

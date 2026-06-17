@@ -47,7 +47,7 @@ The solution is designed to reduce dependency on direct source-code edits for re
 
 - React `19.2.4`
 - React DOM `19.2.4`
-- React Router DOM `7.13.1`
+- React Router DOM `7.13.2`
 - React Scripts `5.0.1`
 - Framer Motion `12.38.0`
 - GSAP `3.14.2`
@@ -55,16 +55,19 @@ The solution is designed to reduce dependency on direct source-code edits for re
 - Lucide React `1.7.0`
 - ColorThief `3.3.1`
 - Web Vitals `2.1.4`
-- React Testing Library and related testing utilities
+- React Testing Library DOM `10.4.1`
+- React Testing Library Jest DOM `6.9.1`
+- React Testing Library React `16.3.2`
+- React Testing Library User Event `13.5.0`
 
 ### Backend
 
-- Node.js
-- Express `4.18.2`
-- CORS `2.8.5`
-- Multer `1.4.5-lts.1`
-- UUID `9.0.0`
-- Nodemon `3.0.2` for development
+- Node.js `18.20.8`
+- Express `4.22.1`
+- CORS `2.8.6`
+- Multer `1.4.5-lts.2`
+- UUID `9.0.1`
+- Nodemon `3.1.14` for development
 
 ### Data and Storage
 
@@ -91,23 +94,127 @@ The application follows a simple client-server architecture:
 
 ```text
 AARNA-WEBISTE/
+|-- .gitignore
+|-- DOCUMENTATION.md
 |-- backend/
 |   |-- data/
+|   |   |-- analytics.json
+|   |   |-- contacts.json
+|   |   |-- gallery.json
+|   |   |-- sections.json
+|   |   |-- services.json
+|   |   |-- settings.json
+|   |   `-- siteMedia.json
 |   |-- uploads/
+|   |   `-- uploaded media assets used by the live/admin-managed website
+|   |-- package-lock.json
 |   |-- package.json
 |   `-- server.js
 |-- client/
+|   |-- ANIMATION_ENHANCEMENTS.md
+|   |-- README.md
+|   |-- backend/
+|   |   |-- data/
+|   |   |   |-- analytics.json
+|   |   |   |-- master.json
+|   |   |   `-- siteMedia.json
+|   |   |-- node_modules/
+|   |   |   `-- local dependency folder for the legacy nested backend
+|   |   |-- package-lock.json
+|   |   |-- package.json
+|   |   `-- server.js
+|   |-- package-lock.json
+|   |-- package.json
 |   |-- public/
+|   |   |-- about-hero.jpg
+|   |   |-- all_services.png
+|   |   |-- catering.png
+|   |   |-- contact.png
+|   |   |-- event_planning.png
+|   |   |-- first.png
+|   |   |-- index.html
+|   |   |-- lighting_sound.png
+|   |   |-- logo.png
+|   |   |-- logo192.png
+|   |   |-- logo512.png
+|   |   |-- luxury_resort_hero_bg_1773044541440.png
+|   |   |-- manifest.json
+|   |   |-- our_signature_services.png
+|   |   |-- ourspace_dining.png
+|   |   |-- ourspace_grandcelebration_hall.png
+|   |   |-- ourspace_guest_accommodation_room.png
+|   |   |-- ourspace_kalyani.png
+|   |   |-- ourspace_outdoor_lawn.png
+|   |   |-- ourspace_temple.png
+|   |   |-- ourspace_wellequiped_kitchen.png
+|   |   |-- ourspce_well_equiped_kitchen.png
+|   |   |-- robots.txt
+|   |   |-- room_booking.png
+|   |   |-- second.png
+|   |   |-- site.webmanifest
+|   |   |-- sitemap.xml
+|   |   |-- venue_arrangement.png
+|   |   `-- wedding_decor.png
 |   |-- src/
+|   |   |-- App.css
+|   |   |-- App.js
+|   |   |-- App.test.js
+|   |   |-- index.css
+|   |   |-- index.js
+|   |   |-- logo.svg
+|   |   |-- reportWebVitals.js
+|   |   |-- setupTests.js
+|   |   |-- Assets/
+|   |   |   |-- fonts/
+|   |   |   |   `-- Samarkan.ttf
+|   |   |   `-- video/
+|   |   |       |-- landscape.mp4
+|   |   |       |-- logo animation.mp4
+|   |   |       `-- portrait.mp4
 |   |   |-- components/
+|   |   |   |-- FloatingContact.css
+|   |   |   |-- FloatingContact.js
+|   |   |   |-- Footer.css
+|   |   |   |-- Footer.js
+|   |   |   |-- Header.css
+|   |   |   |-- Header.js
+|   |   |   `-- ScrollToTop.js
 |   |   |-- hooks/
+|   |   |   |-- useGallery.js
+|   |   |   |-- usePageSeo.js
+|   |   |   |-- useSections.js
+|   |   |   |-- useService.js
+|   |   |   `-- useSettings.js
 |   |   |-- pages/
+|   |   |   |-- About.js
+|   |   |   |-- Contact.js
+|   |   |   |-- DynamicPage.js
+|   |   |   |-- Gallery.js
+|   |   |   |-- Home.js
+|   |   |   |-- PrivacyPolicy.js
+|   |   |   |-- TermsOfService.js
+|   |   |   `-- Admin/
+|   |   |       |-- AdminPanel.css
+|   |   |       `-- AdminPanel.js
 |   |   |-- services/
-|   |   `-- styles/
-|   `-- package.json
-|-- .gitignore
-`-- DOCUMENTATION.md
+|   |   |   `-- api.js
+|   |   |-- styles/
+|   |   |   |-- About.css
+|   |   |   |-- Contact.css
+|   |   |   |-- DynamicPage.css
+|   |   |   |-- Gallery.css
+|   |   |   |-- Home.css
+|   |   |   |-- PrivacyTerms.css
+|   |   |   `-- variables.css
+|   |   `-- utils/
+|   |       `-- mediaOptimization.js
 ```
+
+Note:
+
+- The structure above reflects the current repository contents relevant to application behavior and maintenance.
+- Dependency folders such as root/frontend `node_modules` are intentionally not expanded in this document because they are generated installation artifacts rather than authored project source.
+- The `client/backend/` directory exists as a secondary or legacy backend structure inside the frontend workspace and should be treated separately from the active root-level `backend/`.
 
 ## 8. Delivered Functional Modules
 
@@ -273,6 +380,7 @@ The backend also supports named media upload fields for key pages, including:
 
 Verified current local development configuration:
 
+- Node.js runtime: `18.20.8`
 - frontend development server: `http://localhost:3000`
 - backend server port: `5010`
 - frontend proxy: `http://localhost:5010`

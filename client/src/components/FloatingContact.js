@@ -4,7 +4,7 @@ import './FloatingContact.css';
 
 const FloatingContact = () => {
   const phoneNumber = "9845122100"; 
-  const email = "aarnadestinations@gmail.com";
+  const email = "destinations@aarna.net.in";
   const whatsappNumber = "9845122100";
 
   return (

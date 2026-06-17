@@ -395,6 +395,25 @@
   min-height: 140px;
 }
 
+.form-group input.input-error,
+.form-group select.input-error,
+.form-group textarea.input-error {
+  border-color: #c0392b;
+  background: #fff8f8;
+  box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.12);
+}
+
+.field-error {
+  font-size: 0.78rem;
+  color: #c0392b;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  margin-top: -4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* Buttons */
 .btn-maroon {
   display: inline-flex;

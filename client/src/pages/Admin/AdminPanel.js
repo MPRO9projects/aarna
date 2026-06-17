@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './AdminPanel.css';
 import {
+  clearAdminAuthToken,
+  fetchAdminSession,
   fetchSections, addSection, updateSection, deleteSection,
   fetchServices, addService, deleteService, updateService,
   fetchGallery, addGalleryImage, deleteGalleryImage,
   fetchContacts, markContactRead, deleteContact,
   fetchSettings, updateSettings,
   fetchAnalytics,
-  fetchSiteMedia, updateSiteMedia, resolveMediaUrl,
+  fetchSiteMedia, updateSiteMedia, loginAdmin, resolveMediaUrl,
 } from '../../services/api';
 import { usePageSeo } from '../../hooks/usePageSeo';
 import { optimizeImageFile } from '../../utils/mediaOptimization';
@@ -17,6 +19,8 @@ const px = (img) => resolveMediaUrl(img);
 /* ─── Mini bar chart ─── */
 function BarChart({ data }) {
   const max = Math.max(...data.map(d => d.count), 1);
+
+
   return (
     <div className="bar-chart">
       {data.map((d, i) => (
@@ -59,6 +63,12 @@ function VideoField({ label, name, currentSrc, onChange }) {
   );
 }
 
+const DEFAULT_AUTH_STATE = {
+  checking: true,
+  isAuthenticated: false,
+  username: '',
+};
+
 export default function AdminPanel() {
   usePageSeo({
     title: 'Admin Panel',
@@ -67,6 +77,10 @@ export default function AdminPanel() {
     robots: 'noindex,nofollow',
   });
 
+  const [authState, setAuthState] = useState(DEFAULT_AUTH_STATE);
+  const [authError, setAuthError] = useState('');
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginLoading, setLoginLoading] = useState(false);
   const [tab, setTab] = useState('analytics');
 
   // Data
@@ -102,6 +116,28 @@ export default function AdminPanel() {
     setFImage(null); setFImagePreview(null);
   };
 
+  const handleSessionExpired = useCallback((message = 'Your admin session expired. Please sign in again.') => {
+    clearAdminAuthToken();
+    setAuthState({ ...DEFAULT_AUTH_STATE, checking: false });
+    setAuthError(message);
+    setAnalytics(null);
+    setSections([]);
+    setServices([]);
+    setGallery([]);
+    setContacts([]);
+  }, []);
+
+  const runProtectedRequest = useCallback(async (requestFn) => {
+    try {
+      return await requestFn();
+    } catch (error) {
+      if (error?.status === 401 || error?.status === 403 || error?.code === 'UNAUTHORIZED' || error?.code === 'FORBIDDEN') {
+        handleSessionExpired(error.message);
+      }
+      throw error;
+    }
+  }, [handleSessionExpired]);
+
   const startEdit = (type, item) => {
     setEditId(item.id); setEditType(type);
     setFTitle(item.title || ''); setFSubtitle(item.subtitle || '');
@@ -114,25 +150,69 @@ export default function AdminPanel() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const loadSectionsData = useCallback(async () => {
-    const data = await fetchSections().catch(() => []);
-    setSections((data || []).map(x => ({ ...x, image: px(x.image) })));
+  useEffect(() => {
+    let mounted = true;
+
+    const restoreSession = async () => {
+      try {
+        const session = await fetchAdminSession();
+        if (!mounted) return;
+
+        setAuthState({
+          checking: false,
+          isAuthenticated: true,
+          username: session?.admin?.username || 'admin',
+        });
+      } catch (error) {
+        if (!mounted) return;
+
+        clearAdminAuthToken();
+        setAuthState({ ...DEFAULT_AUTH_STATE, checking: false });
+      }
+    };
+
+    restoreSession();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  const loadSectionsData = useCallback(async () => {
+    try {
+      const data = await runProtectedRequest(() => fetchSections());
+      setSections((data || []).map(x => ({ ...x, image: px(x.image) })));
+    } catch (_) {
+      setSections([]);
+    }
+  }, [runProtectedRequest]);
 
   const loadServicesData = useCallback(async () => {
-    const data = await fetchServices().catch(() => []);
-    setServices((data || []).map(x => ({ ...x, image: px(x.image) })));
-  }, []);
+    try {
+      const data = await runProtectedRequest(() => fetchServices());
+      setServices((data || []).map(x => ({ ...x, image: px(x.image) })));
+    } catch (_) {
+      setServices([]);
+    }
+  }, [runProtectedRequest]);
 
   const loadGalleryData = useCallback(async () => {
-    const data = await fetchGallery().catch(() => []);
-    setGallery((data || []).map(x => ({ ...x, image: px(x.image) })));
-  }, []);
+    try {
+      const data = await runProtectedRequest(() => fetchGallery());
+      setGallery((data || []).map(x => ({ ...x, image: px(x.image) })));
+    } catch (_) {
+      setGallery([]);
+    }
+  }, [runProtectedRequest]);
 
   const loadContactsData = useCallback(async () => {
-    const data = await fetchContacts().catch(() => []);
-    setContacts(data || []);
-  }, []);
+    try {
+      const data = await runProtectedRequest(() => fetchContacts());
+      setContacts(data || []);
+    } catch (_) {
+      setContacts([]);
+    }
+  }, [runProtectedRequest]);
 
   const loadSettingsData = useCallback(async () => {
     const data = await fetchSettings().catch(() => ({}));
@@ -145,17 +225,23 @@ export default function AdminPanel() {
   }, []);
 
   const loadAnalyticsData = useCallback(async () => {
-    const data = await fetchAnalytics().catch(() => null);
-    setAnalytics(data);
-  }, []);
+    try {
+      const data = await runProtectedRequest(() => fetchAnalytics());
+      setAnalytics(data);
+    } catch (_) {
+      setAnalytics(null);
+    }
+  }, [runProtectedRequest]);
 
   useEffect(() => {
+    if (!authState.isAuthenticated) return undefined;
     loadContactsData();
     loadSettingsData();
     loadSiteMediaData();
-  }, [loadContactsData, loadSettingsData, loadSiteMediaData]);
+  }, [authState.isAuthenticated, loadContactsData, loadSettingsData, loadSiteMediaData]);
 
   useEffect(() => {
+    if (!authState.isAuthenticated) return;
     if (tab === 'analytics' && !analytics) loadAnalyticsData();
     if (tab === 'sections' && sections.length === 0) loadSectionsData();
     if (tab === 'services' && services.length === 0) loadServicesData();
@@ -173,19 +259,49 @@ export default function AdminPanel() {
     sections.length,
     services.length,
     tab,
+    authState.isAuthenticated,
   ]);
 
   useEffect(() => {
+    if (!authState.isAuthenticated) return undefined;
     if (tab !== 'analytics') return undefined;
     const t = setInterval(() => loadAnalyticsData(), 30000);
     return () => clearInterval(t);
-  }, [loadAnalyticsData, tab]);
+  }, [authState.isAuthenticated, loadAnalyticsData, tab]);
 
   const handleOptimizedImageSelect = useCallback(async (file) => {
     if (!file) return;
     const optimized = await optimizeImageFile(file);
     setFImage(optimized);
     setFImagePreview(URL.createObjectURL(optimized));
+  }, []);
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    setAuthError('');
+
+    try {
+      const result = await loginAdmin(loginForm);
+      setAuthState({
+        checking: false,
+        isAuthenticated: true,
+        username: result?.admin?.username || loginForm.username,
+      });
+      setLoginForm({ username: '', password: '' });
+    } catch (error) {
+      setAuthError(error.message || 'Unable to sign in.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = useCallback(() => {
+    clearAdminAuthToken();
+    setAuthState({ ...DEFAULT_AUTH_STATE, checking: false });
+    setAuthError('');
+    setLoginForm({ username: '', password: '' });
+    setTab('analytics');
   }, []);
 
   const buildFD = (fields) => {
@@ -196,61 +312,113 @@ export default function AdminPanel() {
   };
 
   const handleSaveSection = async (e) => {
-    e.preventDefault(); setLoading(true);
-    const stats = fStats.filter(s => s.label).map(s => ({ label: s.label, value: s.value }));
-    const fd = buildFD({
-      title: fTitle, description: fDesc, longDescription: fLongDesc,
-      location: fLocation, eyebrow: fEyebrow,
-      highlights: JSON.stringify(fHighlights.split('\n').map(s => s.trim()).filter(Boolean)),
-      stats: JSON.stringify(stats),
-    });
-    if (editId && editType === 'section') await updateSection(editId, fd);
-    else await addSection(fd);
-    resetForm();
-    await loadSectionsData();
-    setLoading(false);
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const stats = fStats.filter(s => s.label).map(s => ({ label: s.label, value: s.value }));
+      const fd = buildFD({
+        title: fTitle, description: fDesc, longDescription: fLongDesc,
+        location: fLocation, eyebrow: fEyebrow,
+        highlights: JSON.stringify(fHighlights.split('\n').map(s => s.trim()).filter(Boolean)),
+        stats: JSON.stringify(stats),
+      });
+      if (editId && editType === 'section') await runProtectedRequest(() => updateSection(editId, fd));
+      else await runProtectedRequest(() => addSection(fd));
+      resetForm();
+      await loadSectionsData();
+    } catch (error) {
+      alert(error.message || 'Unable to save section.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveService = async (e) => {
-    e.preventDefault(); setLoading(true);
-    const fd = buildFD({ title: fTitle, subtitle: fSubtitle, description: fDesc });
-    if (editId && editType === 'service') await updateService(editId, fd);
-    else await addService(fd);
-    resetForm();
-    await loadServicesData();
-    setLoading(false);
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const fd = buildFD({ title: fTitle, subtitle: fSubtitle, description: fDesc });
+      if (editId && editType === 'service') await runProtectedRequest(() => updateService(editId, fd));
+      else await runProtectedRequest(() => addService(fd));
+      resetForm();
+      await loadServicesData();
+    } catch (error) {
+      alert(error.message || 'Unable to save service.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveGallery = async (e) => {
-    e.preventDefault(); setLoading(true);
-    const fd = buildFD({ title: fTitle, category: fCategory });
-    await addGalleryImage(fd);
-    resetForm();
-    await loadGalleryData();
-    setLoading(false);
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const fd = buildFD({ title: fTitle, category: fCategory });
+      await runProtectedRequest(() => addGalleryImage(fd));
+      resetForm();
+      await loadGalleryData();
+    } catch (error) {
+      alert(error.message || 'Unable to add gallery image.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (type, id) => {
     if (!window.confirm('Delete this item?')) return;
-    if (type === 'section') { await deleteSection(id); await loadSectionsData(); }
-    if (type === 'service') { await deleteService(id); await loadServicesData(); }
-    if (type === 'gallery') { await deleteGalleryImage(id); await loadGalleryData(); }
-    if (type === 'contact') { await deleteContact(id); await loadContactsData(); }
+
+    try {
+      if (type === 'section') { await runProtectedRequest(() => deleteSection(id)); await loadSectionsData(); }
+      if (type === 'service') { await runProtectedRequest(() => deleteService(id)); await loadServicesData(); }
+      if (type === 'gallery') { await runProtectedRequest(() => deleteGalleryImage(id)); await loadGalleryData(); }
+      if (type === 'contact') { await runProtectedRequest(() => deleteContact(id)); await loadContactsData(); }
+    } catch (error) {
+      alert(error.message || 'Unable to delete item.');
+    }
   };
 
   const [smFiles, setSmFiles] = useState({});
   const [smPreviews, setSmPreviews] = useState({});
+  const [smProcessing, setSmProcessing] = useState({});
+  const smPreviewsRef = useRef({});
+
+  const releasePreviewUrl = useCallback((url) => {
+    if (typeof url === 'string' && url.startsWith('blob:')) {
+      URL.revokeObjectURL(url);
+    }
+  }, []);
 
   const handleSaveMedia = async (e) => {
-    e.preventDefault(); setLoading(true);
-    const fd = new FormData();
-    ['heroTitle', 'heroTagline', 'heroSubtitle', 'heroComingSoon'].forEach(k => fd.append(k, siteMedia[k] || ''));
-    Object.entries(smFiles).forEach(([k, f]) => fd.append(k, f));
-    const updated = await updateSiteMedia(fd);
-    setSiteMedia(updated);
-    setSmFiles({}); setSmPreviews({});
-    setLoading(false);
-    alert('Page media saved!');
+    e.preventDefault();
+
+    if (Object.values(smProcessing).some(Boolean)) {
+      alert('Please wait for selected images to finish preparing before saving.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const fd = new FormData();
+      ['heroTitle', 'heroTagline', 'heroSubtitle', 'heroComingSoon'].forEach(k => fd.append(k, siteMedia[k] || ''));
+      Object.entries(smFiles).forEach(([k, f]) => fd.append(k, f));
+      const updated = await runProtectedRequest(() => updateSiteMedia(fd));
+      const latest = await fetchSiteMedia().catch(() => updated);
+      setSiteMedia(latest || updated);
+      setSmFiles({});
+      Object.values(smPreviewsRef.current).forEach(releasePreviewUrl);
+      smPreviewsRef.current = {};
+      setSmPreviews({});
+      setSmProcessing({});
+      alert('Page media saved!');
+    } catch (error) {
+      alert(error.message || 'Unable to save page media.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSmFile = useCallback(async (key, file, isVideo) => {
@@ -264,12 +432,62 @@ export default function AdminPanel() {
       return;
     }
 
-    const optimized = await optimizeImageFile(file);
-    setSmFiles(prev => ({ ...prev, [key]: optimized }));
-    setSmPreviews(prev => ({ ...prev, [key]: URL.createObjectURL(optimized) }));
-  }, []);
+    const localPreview = URL.createObjectURL(file);
+    releasePreviewUrl(smPreviewsRef.current[key]);
+    smPreviewsRef.current[key] = localPreview;
+
+    setSmFiles(prev => ({ ...prev, [key]: file }));
+    setSmPreviews(prev => ({ ...prev, [key]: localPreview }));
+    setSmProcessing(prev => ({ ...prev, [key]: true }));
+
+    try {
+      const optimized = await optimizeImageFile(file);
+      const optimizedPreview = URL.createObjectURL(optimized);
+
+      releasePreviewUrl(smPreviewsRef.current[key]);
+      smPreviewsRef.current[key] = optimizedPreview;
+
+      setSmFiles(prev => ({ ...prev, [key]: optimized }));
+      setSmPreviews(prev => ({ ...prev, [key]: optimizedPreview }));
+    } catch (error) {
+      setSmFiles(prev => ({ ...prev, [key]: file }));
+      setSmPreviews(prev => ({ ...prev, [key]: localPreview }));
+    } finally {
+      setSmProcessing(prev => ({ ...prev, [key]: false }));
+    }
+  }, [releasePreviewUrl]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(smPreviewsRef.current).forEach(releasePreviewUrl);
+      smPreviewsRef.current = {};
+    };
+  }, [releasePreviewUrl]);
 
   const unread = contacts.filter(c => !c.read).length;
+
+  const handleMarkContactRead = async (contactId) => {
+    try {
+      await runProtectedRequest(() => markContactRead(contactId));
+      await loadContactsData();
+    } catch (error) {
+      alert(error.message || 'Unable to mark contact as read.');
+    }
+  };
+
+  const handleSettingsSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await runProtectedRequest(() => updateSettings(settings));
+      alert('Settings saved!');
+    } catch (error) {
+      alert(error.message || 'Unable to save settings.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const TABS = [
     { key: 'analytics', icon: '📊', label: 'Analytics' },
@@ -281,6 +499,70 @@ export default function AdminPanel() {
     { key: 'settings', icon: '⚙️', label: 'Settings' },
   ];
 
+  if (authState.checking) {
+    return (
+      <div className="ap-root">
+        <main className="ap-main">
+          <div className="ap-page">
+            <div className="ap-empty">
+              <span className="ap-spinner">...</span>
+              <p>Checking admin session...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!authState.isAuthenticated) {
+    return (
+      <div className="ap-root">
+        <main className="ap-main">
+          <div className="ap-page">
+            <div className="ap-page-header">
+              <h1>Admin Sign In</h1>
+              <p className="ap-page-sub">Authorized administrators only.</p>
+            </div>
+
+            <div className="ap-form-card" style={{ maxWidth: 480 }}>
+              <h2 className="ap-form-title">Secure Access</h2>
+              <form onSubmit={handleLoginSubmit}>
+                <div className="form-group">
+                  <label>Username</label>
+                  <input
+                    value={loginForm.username}
+                    onChange={(e) => setLoginForm((prev) => ({ ...prev, username: e.target.value }))}
+                    autoComplete="username"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm((prev) => ({ ...prev, password: e.target.value }))}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+                {authError && (
+                  <div className="ap-hint" style={{ color: '#b42318', marginBottom: 16 }}>
+                    {authError}
+                  </div>
+                )}
+                <div className="ap-form-actions">
+                  <button type="submit" disabled={loginLoading} className="ap-btn-primary">
+                    {loginLoading ? 'Signing In...' : 'Sign In'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
   return (
     <div className="ap-root">
       {/* ── Sidebar ── */}
@@ -298,6 +580,12 @@ export default function AdminPanel() {
             </button>
           ))}
         </nav>
+        <div style={{ marginTop: 20, padding: '0 12px 20px' }}>
+          <div className="ap-page-sub" style={{ marginBottom: 12 }}>Signed in as {authState.username}</div>
+          <button type="button" onClick={handleLogout} className="ap-btn-ghost" style={{ width: '100%' }}>
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       {/* ── Main ── */}
@@ -575,12 +863,12 @@ export default function AdminPanel() {
                 <div className="ap-form-row">
                   <div className="form-group">
                     <label>Main Image</label>
-                    <div className="img-preview"><img src={smPreviews.eventMainImage || px(siteMedia.eventMainImage) || '/first.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <div className="img-preview"><img src={smPreviews.eventMainImage || px(siteMedia.eventMainImage) || '/images/first.png'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('eventMainImage', e.target.files[0], false); }} />
                   </div>
                   <div className="form-group">
                     <label>Floating Card Image</label>
-                    <div className="img-preview"><img src={smPreviews.eventFloatImage || px(siteMedia.eventFloatImage) || '/second.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <div className="img-preview"><img src={smPreviews.eventFloatImage || px(siteMedia.eventFloatImage) || '/images/second.png'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('eventFloatImage', e.target.files[0], false); }} />
                   </div>
                 </div>
@@ -609,19 +897,19 @@ export default function AdminPanel() {
                 <div className="ap-form-row">
                   <div className="form-group">
                     <label>Hero Background Image</label>
-                    <div className="img-preview"><img src={smPreviews.aboutHeroImage || px(siteMedia.aboutHeroImage) || '/about-hero.jpg'} alt="" loading="lazy" decoding="async" /></div>
+                    <div className="img-preview"><img src={smPreviews.aboutHeroImage || px(siteMedia.aboutHeroImage) || '/images/about-hero.jpg'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('aboutHeroImage', e.target.files[0], false); }} />
                   </div>
                   <div className="form-group">
                     <label>Intro Main Image</label>
-                    <div className="img-preview"><img src={smPreviews.aboutIntroMainImage || px(siteMedia.aboutIntroMainImage) || '/first.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <div className="img-preview"><img src={smPreviews.aboutIntroMainImage || px(siteMedia.aboutIntroMainImage) || '/images/first.png'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('aboutIntroMainImage', e.target.files[0], false); }} />
                   </div>
                 </div>
                 <div className="ap-form-row">
                   <div className="form-group">
                     <label>Intro Floating Image</label>
-                    <div className="img-preview"><img src={smPreviews.aboutIntroFloatImage || px(siteMedia.aboutIntroFloatImage) || '/second.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <div className="img-preview"><img src={smPreviews.aboutIntroFloatImage || px(siteMedia.aboutIntroFloatImage) || '/images/second.png'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('aboutIntroFloatImage', e.target.files[0], false); }} />
                   </div>
                   <div className="form-group">
@@ -638,7 +926,7 @@ export default function AdminPanel() {
                 <div className="ap-form-row">
                   <div className="form-group">
                     <label>Hero Background Image</label>
-                    <div className="img-preview"><img src={smPreviews.contactHeroImage || px(siteMedia.contactHeroImage) || '/contact.png'} alt="" loading="lazy" decoding="async" /></div>
+                    <div className="img-preview"><img src={smPreviews.contactHeroImage || px(siteMedia.contactHeroImage) || '/images/contact-hero.png'} alt="" loading="lazy" decoding="async" /></div>
                     <input type="file" accept="image/*" onChange={e => { if (e.target.files[0]) handleSmFile('contactHeroImage', e.target.files[0], false); }} />
                   </div>
                 </div>
@@ -681,7 +969,7 @@ export default function AdminPanel() {
                     )}
                     <div className="ap-contact-actions">
                       {!c.read && (
-                        <button onClick={async () => { await markContactRead(c.id); const d = await fetchContacts(); setContacts(d); }} className="ap-btn-read">✓ Mark Read</button>
+                        <button onClick={() => handleMarkContactRead(c.id)} className="ap-btn-read">✓ Mark Read</button>
                       )}
                       <button onClick={() => handleDelete('contact', c.id)} className="ap-btn-delete ap-btn-delete-sm">🗑 Delete</button>
                     </div>
@@ -697,7 +985,7 @@ export default function AdminPanel() {
           <div className="ap-page">
             <div className="ap-page-header"><h1>Site Settings</h1><p className="ap-page-sub">Contact info and social links used across the site</p></div>
             <div className="ap-form-card">
-              <form onSubmit={async e => { e.preventDefault(); await updateSettings(settings); alert('Settings saved!'); }}>
+              <form onSubmit={handleSettingsSave}>
                 <div className="ap-form-row">
                   <div className="form-group"><label>Site Name</label><input value={settings.siteName || ''} onChange={e => setSettings(p => ({ ...p, siteName: e.target.value }))} /></div>
                   <div className="form-group"><label>Primary Phone</label><input value={settings.phone || ''} onChange={e => setSettings(p => ({ ...p, phone: e.target.value }))} /></div>
@@ -725,3 +1013,4 @@ export default function AdminPanel() {
     </div>
   );
 }
+

@@ -7,6 +7,12 @@ build/
 .env
 .env.*
 !.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/private-data/
+backend/private-data/**
+backend/data/*.backup.json
 coverage/
 *.log
 

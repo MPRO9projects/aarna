@@ -158,7 +158,7 @@ const TermsOfService = () => {
               <ul className="pt-terms-list">
                 <li>For any questions regarding these terms, please contact us at:</li>
                 <li>Phone: +91 98765 43210</li>
-                <li>Email: aarnadestinations@gmail.com</li>
+                <li>Email: destinations@aarna.net.in</li>
                 <li>Address: Mysore-Bangalore Road, Near Mysore, Karnataka, India</li>
               </ul>
             </div>
