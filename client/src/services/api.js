@@ -3,8 +3,9 @@
 // ============================================
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-const SERVER_BASE_URL = isDevelopment ? 'http://localhost:5010' : 'https://backend.aarna.net.in';
-const API_URL = `${SERVER_BASE_URL}/api`;
+const configuredBaseUrl = (process.env.REACT_APP_API_BASE_URL || '').trim().replace(/\/+$/, '');
+const SERVER_BASE_URL = configuredBaseUrl || (isDevelopment ? 'http://localhost:5010' : '');
+const API_URL = SERVER_BASE_URL ? `${SERVER_BASE_URL}/api` : '/api';
 const ADMIN_TOKEN_KEY = 'aarna_admin_token';
 const requestCache = new Map();
 const inFlightRequests = new Map();

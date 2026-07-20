@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 
 const SITE_NAME = 'Aarna Wedding Destination';
-const SITE_URL = 'https://aarna.net.in';
+export const SITE_URL = (process.env.REACT_APP_SITE_URL || 'https://aarna.net.in').replace(/\/+$/, '');
 const DEFAULT_IMAGE = `${SITE_URL}/images/logo512.png`;
+const DEFAULT_ROBOTS = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 
 const upsertMeta = (selector, attributes) => {
   let element = document.head.querySelector(selector);
@@ -46,14 +47,17 @@ export function usePageSeo({
   title,
   description,
   routePath = '/',
+  canonicalPath,
   image = DEFAULT_IMAGE,
-  robots = 'index,follow',
+  robots = DEFAULT_ROBOTS,
   imageAlt = `${SITE_NAME} preview image`,
   type = 'website',
+  jsonLd,
 }) {
   useEffect(() => {
     const resolvedTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
     const resolvedUrl = getPublicUrl(routePath);
+    const resolvedCanonicalUrl = getPublicUrl(canonicalPath || routePath);
 
     document.title = resolvedTitle;
 
@@ -127,7 +131,20 @@ export function usePageSeo({
     });
     upsertLink('link[rel="canonical"]', {
       rel: 'canonical',
-      href: resolvedUrl,
+      href: resolvedCanonicalUrl,
     });
-  }, [description, image, imageAlt, robots, routePath, title, type]);
+
+    const existingJsonLd = document.head.querySelector('script[data-seo-json-ld="true"]');
+    if (jsonLd) {
+      const script = existingJsonLd || document.createElement('script');
+      script.setAttribute('type', 'application/ld+json');
+      script.setAttribute('data-seo-json-ld', 'true');
+      script.textContent = JSON.stringify(jsonLd);
+      if (!existingJsonLd) {
+        document.head.appendChild(script);
+      }
+    } else if (existingJsonLd) {
+      existingJsonLd.remove();
+    }
+  }, [canonicalPath, description, image, imageAlt, jsonLd, robots, routePath, title, type]);
 }

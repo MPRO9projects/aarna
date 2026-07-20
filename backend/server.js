@@ -44,6 +44,10 @@ app.disable('x-powered-by');
 const PORT = Number(process.env.PORT || 5010);
 const DATA_DIR = path.join(__dirname, 'data');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const CLIENT_BUILD_DIR = path.resolve(
+  __dirname,
+  process.env.CLIENT_BUILD_DIR || '../client/build'
+);
 const JSON_BODY_LIMIT = process.env.JSON_BODY_LIMIT || '1mb';
 const ADMIN_USERNAME = (process.env.ADMIN_USERNAME || '').trim();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
@@ -1259,6 +1263,19 @@ app.put(
     }
   }
 );
+
+if (fs.existsSync(path.join(CLIENT_BUILD_DIR, 'index.html'))) {
+  app.use(express.static(CLIENT_BUILD_DIR));
+
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path === '/csp-report') {
+      next();
+      return;
+    }
+
+    res.sendFile(path.join(CLIENT_BUILD_DIR, 'index.html'));
+  });
+}
 
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {

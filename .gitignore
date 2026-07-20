@@ -12,7 +12,10 @@ backend/.env.*
 !backend/.env.example
 backend/private-data/
 backend/private-data/**
+backend/uploads/
+backend/uploads/**
 backend/data/*.backup.json
+client/backend/
 coverage/
 *.log
 

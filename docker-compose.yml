@@ -1,0 +1,15 @@
+services:
+  aarna-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aarna-web
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5010:5010"
+    volumes:
+      - ./backend/data:/app/backend/data
+      - ./backend/uploads:/app/backend/uploads
+      - ./backend/private-data:/app/backend/private-data
