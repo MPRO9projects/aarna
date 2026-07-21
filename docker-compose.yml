@@ -1,5 +1,6 @@
 services:
   aarna-web:
+    image: ghcr.io/infompro9-maker/aarna:latest
     build:
       context: .
       dockerfile: Dockerfile
