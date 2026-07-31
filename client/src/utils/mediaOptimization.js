@@ -47,7 +47,10 @@ export const optimizeImageFile = async (file) => {
   const { width, height, image, url } = await readImageDimensions(file);
   const largestSide = Math.max(width, height);
   const shouldResize = largestSide > IMAGE_MAX_DIMENSION;
-  const targetType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+  const targetType =
+    file.type === 'image/png' || file.type === 'image/webp'
+      ? file.type
+      : 'image/jpeg';
 
   if (!shouldResize && file.size < 900 * 1024) {
     URL.revokeObjectURL(url);
@@ -62,7 +65,9 @@ export const optimizeImageFile = async (file) => {
   canvas.width = targetWidth;
   canvas.height = targetHeight;
 
-  const context = canvas.getContext('2d', { alpha: targetType === 'image/png' });
+  const context = canvas.getContext('2d', {
+    alpha: targetType === 'image/png' || targetType === 'image/webp',
+  });
   context.drawImage(image, 0, 0, targetWidth, targetHeight);
 
   const blob = await canvasToBlob(canvas, targetType, IMAGE_QUALITY);
@@ -71,11 +76,12 @@ export const optimizeImageFile = async (file) => {
   const fileName =
     targetType === 'image/jpeg'
       ? file.name.replace(/\.[^.]+$/, '.jpg')
-      : file.name;
+      : targetType === 'image/webp'
+        ? file.name.replace(/\.[^.]+$/, '.webp')
+        : file.name;
 
   return new File([blob], fileName, {
     type: blob.type || targetType,
     lastModified: Date.now(),
   });
 };
-

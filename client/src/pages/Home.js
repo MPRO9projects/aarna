@@ -1274,18 +1274,35 @@ function Home() {
   }, [autoDuration, clearTimers, goNext, openedSpace, progressValue]);
 
   useEffect(() => {
+    if (!finalSpaces.length) {
+      return undefined;
+    }
+
+    const candidateIndexes = [
+      activeIndex,
+      (activeIndex + 1) % finalSpaces.length,
+      (activeIndex - 1 + finalSpaces.length) % finalSpaces.length,
+    ];
     const preloaded = [];
-    finalSpaces.forEach((space) => {
+    const seen = new Set();
+
+    candidateIndexes.forEach((index) => {
+      const space = finalSpaces[index];
+      if (!space?.image || seen.has(space.image)) {
+        return;
+      }
+
+      seen.add(space.image);
       const img = new Image();
       img.decoding = 'async';
-      img.loading = 'eager';
       img.src = space.image;
       preloaded.push(img);
     });
+
     return () => {
       preloaded.length = 0;
     };
-  }, [finalSpaces]);
+  }, [activeIndex, finalSpaces]);
 
   const handleIntroComplete = useCallback(() => {
     if (introCompletedRef.current) return;
@@ -1804,9 +1821,9 @@ function Home() {
                               alt={space.title}
                               className="space-thumb-photo"
                               ref={isCenter ? activeCardImageRef : null}
-                              loading="eager"
+                              loading={isCenter ? 'eager' : 'lazy'}
                               decoding="async"
-                              fetchPriority={isCenter ? 'high' : 'auto'}
+                              fetchPriority={isCenter ? 'high' : 'low'}
                               sizes={isCenter ? '(max-width: 991px) 78vw, 34vw' : '(max-width: 991px) 44vw, 26vw'}
                               animate={{ scale: isCenter ? 1.01 : 1 }}
                               whileHover={{ scale: 1.05 }}
@@ -2011,3 +2028,4 @@ function Home() {
 }
 
 export default Home;
+

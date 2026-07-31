@@ -281,7 +281,7 @@ const Gallery = () => {
                 data-reveal="zoom"
                 style={{ animationDelay: `${Math.min(idx * 55, 420)}ms` }}
               >
-                <img src={item.img} alt={item.label} loading="lazy" />
+                <img src={item.img} alt={item.label} loading="lazy" decoding="async" fetchPriority="low" sizes="(max-width: 767px) 100vw, (max-width: 1199px) 50vw, 33vw" />
                 <div className="gallery-caption">
                   <h4>{item.label}</h4>
                   <p>{item.desc}</p>
@@ -308,3 +308,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
